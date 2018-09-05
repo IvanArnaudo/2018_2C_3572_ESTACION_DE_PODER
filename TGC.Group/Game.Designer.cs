@@ -12,7 +12,7 @@ namespace TGC.Group {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
     internal sealed partial class Game : global::System.Configuration.ApplicationSettingsBase {
         
         private static Game defaultInstance = ((Game)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Game())));
@@ -25,7 +25,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Alumnos")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Iván Arnaudo, Ronan Bio, Álvaro Dati, Eric Fahnle, Tomás Gullon")]
         public string Category {
             get {
                 return ((string)(this["Category"]));
@@ -37,7 +37,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Grupo 99")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ESTACION_DE_PODER")]
         public string Name {
             get {
                 return ((string)(this["Name"]));
@@ -49,7 +49,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Mi idea - Descripción de la idea")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Plataformas - Tercera persona")]
         public string Description {
             get {
                 return ((string)(this["Description"]));
