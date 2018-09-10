@@ -1,0 +1,373 @@
+<roomsEditor-Map>
+  <mapSettings width="3000" height="10000" scaleX="1" scaleY="1" scaleZ="1" />
+  <rooms count="46">
+    <room name="Piso" x="50" y="50" width="800" length="1000" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Pared Izquierda" x="0" y="0" width="50" length="10000" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Pared Derecha" x="850" y="0" width="50" length="9150" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Entrada1" x="50" y="0" width="300" length="50" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Entrada2" x="550" y="0" width="300" length="50" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PuertaPiso" x="350" y="0" width="200" length="50" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Elevacion1" x="50" y="1050" width="800" length="2000" height="300" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua1" x="50" y="3050" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua2" x="50" y="3350" width="300" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua3" x="550" y="3350" width="300" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica" x="350" y="3350" width="200" length="100" height="300" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua4" x="50" y="3450" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Elevacion2" x="50" y="3750" width="800" length="2000" height="300" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua5" x="50" y="5750" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua6" x="50" y="6050" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica2" x="650" y="6050" width="200" length="100" height="300" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua7" x="50" y="6150" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua8" x="250" y="6450" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica3" x="50" y="6450" width="200" length="100" height="250" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua9" x="50" y="6550" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua10" x="50" y="6850" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica4" x="650" y="6850" width="200" length="100" height="200" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua11" x="50" y="6950" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua12" x="250" y="7250" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica5" x="50" y="7250" width="200" length="100" height="150" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua13" x="50" y="7350" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua14" x="50" y="7650" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica6" x="650" y="7650" width="200" length="100" height="100" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua15" x="50" y="7750" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Piso2" x="50" y="8450" width="800" length="1500" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua16" x="250" y="8050" width="600" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="PlataformaAcuatica7" x="50" y="8050" width="200" length="100" height="50" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Agua17" x="50" y="8150" width="800" length="300" height="10" floorLevel="0">
+      <wall name="Roof" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="ParedFondo" x="50" y="9950" width="1650" length="50" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Piso5" x="850" y="9250" width="850" length="700" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="ParedCierreCurva" x="1700" y="9100" width="50" length="900" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="ParedCurva1" x="900" y="9100" width="300" length="50" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="ParedCurva2" x="1400" y="9100" width="300" length="50" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Tunel1" x="1200" y="9150" width="200" length="100" height="510" floorLevel="-500">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Piso4" x="1400" y="9150" width="300" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Piso3" x="850" y="9150" width="350" length="100" height="10" floorLevel="0">
+      <wall name="Roof" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Tunel2" x="1200" y="9100" width="200" length="50" height="1000" floorLevel="-500">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Tunel3" x="1200" y="8100" width="200" length="1000" height="200" floorLevel="-500">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Subsuelo1" x="900" y="0" width="850" length="8100" height="500" floorLevel="-500">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Subsuelo2" x="1750" y="0" width="850" length="800" height="1000" floorLevel="-500">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="agua.bmp" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="Subsuelo3" x="1750" y="800" width="850" length="4000" height="500" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="Textura Piso Nivel.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="tierra.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+  </rooms>
+</roomsEditor-Map>
