@@ -41,8 +41,8 @@ namespace TGC.Group.Model
 
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "Fisica1\\EscenaDeEsceneEditor-TgcScene.xml");
-            Camara = new TgcFpsCamera(new TGCVector3(409, 38, 187), 400f, 400f, Input);
+            scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas13-TgcScene.xml");
+            Camara = new TgcFpsCamera(new TGCVector3(56, 165, 335), 400f, 400f, Input);
 
         }
         public override void Update()
