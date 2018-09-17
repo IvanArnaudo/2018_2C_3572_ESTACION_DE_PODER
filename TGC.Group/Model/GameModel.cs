@@ -28,6 +28,7 @@ namespace TGC.Group.Model
         private const float MOVEMENT_SPEED = 200;
         private TgcMesh robot;
         private TgcThirdPersonCamera camara_interna;
+        TGCVector3 vectorCamara = new TGCVector3();
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -47,10 +48,15 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas13-TgcScene.xml");
             robot = scene.Meshes[65];
-            robot.AutoTransform = true;
-            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(),  300, 300);
+            foreach(TgcMesh m in scene.Meshes )
+            {
+                m.RotateY(Geometry.DegreeToRadian(90));
+            }
+            robot.BoundingBox.Dispose();
+            robot.createBoundingBox();
+            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 200);
             Camara = camara_interna;
-            camara_interna.rotateY(Geometry.DegreeToRadian(90));
+            //camara_interna.rotateY(Geometry.DegreeToRadian(0));
         }
         public override void Update()
         {
@@ -59,12 +65,15 @@ namespace TGC.Group.Model
             var movement = TGCVector3.Empty;
             var originalPos = robot.Position;
 
-            movement.X = movimiento_izquierda(input) + movimiento_derecha(input);
-            movement.Z = movimiento_arriba(input) + movimiento_abajo(input);
+            movement.X = MovimientoIzquierda(input) + MovimientoDerecha(input);
+            movement.Z = MovimientoArriba(input) + MovimientoAbajo(input);
             movement *=  ElapsedTime;
             robot.Move(movement);
 
-            camara_interna.Target = robot.Position;
+            vectorCamara.X = robot.Position.X + 200;
+            vectorCamara.Y = robot.Position.Y;
+            vectorCamara.Z = robot.Position.Z - 400;
+            camara_interna.Target = vectorCamara;
 
             PostUpdate();
         }
@@ -80,25 +89,25 @@ namespace TGC.Group.Model
             scene.DisposeAll(); //Dispose de la escena.
         }
 
-        private float movimiento_izquierda(TgcD3dInput input)
+        private float MovimientoIzquierda(TgcD3dInput input)
         {
             if (input.keyDown(Key.Left) || input.keyDown(Key.A))
                 return MOVEMENT_SPEED;
             return 0;
         }
-        private float movimiento_derecha(TgcD3dInput input)
+        private float MovimientoDerecha(TgcD3dInput input)
         {
             if (input.keyDown(Key.Right) || input.keyDown(Key.D))
                 return -MOVEMENT_SPEED;
             return 0;
         }
-        private float movimiento_abajo(TgcD3dInput input)
+        private float MovimientoAbajo(TgcD3dInput input)
         {
             if (input.keyDown(Key.Down) || input.keyDown(Key.S))
                 return MOVEMENT_SPEED;
             return 0;
         }
-        private float movimiento_arriba(TgcD3dInput input)
+        private float MovimientoArriba(TgcD3dInput input)
         {
             if (input.keyDown(Key.Up) || input.keyDown(Key.W))
                 return -MOVEMENT_SPEED;
