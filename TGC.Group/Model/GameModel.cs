@@ -46,7 +46,7 @@ namespace TGC.Group.Model
 
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas13-TgcScene.xml");
+            scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
             robot = scene.Meshes[65];
             foreach(TgcMesh m in scene.Meshes )
             {
