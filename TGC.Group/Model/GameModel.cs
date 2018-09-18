@@ -46,18 +46,18 @@ namespace TGC.Group.Model
 
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas13-TgcScene.xml");
-            robot = scene.Meshes[65];
+            scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
+            robot = scene.Meshes[178];
             robot.AutoTransform = true;
-            foreach(TgcMesh m in scene.Meshes )
+            /*foreach(TgcMesh m in scene.Meshes)
             {
                 m.RotateY(Geometry.DegreeToRadian(90));
                 m.updateBoundingBox();
-            }
+            }*/
             robot.AutoUpdateBoundingBox = true;
-            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 200);
+            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
             Camara = camara_interna;
-            //camara_interna.rotateY(Geometry.DegreeToRadian(0));
+            camara_interna.rotateY(Geometry.DegreeToRadian(180));
         }
         public override void Update()
         {
@@ -66,8 +66,8 @@ namespace TGC.Group.Model
             var movement = TGCVector3.Empty;
             var originalPos = robot.Position;
 
-            movement.X = MovimientoIzquierda(input) - MovimientoDerecha(input);
-            movement.Z = MovimientoAbajo(input) - MovimientoArriba(input);
+            movement.X = MovimientoDerecha(input) - MovimientoIzquierda(input);
+            movement.Z = MovimientoArriba(input) - MovimientoAbajo(input);
             movement *=  ElapsedTime;
             robot.Move(movement);
 
@@ -83,7 +83,10 @@ namespace TGC.Group.Model
         {
             PreRender();
             scene.RenderAll();
-            robot.BoundingBox.Render();
+            foreach (TgcMesh m in scene.Meshes)
+            {
+                m.BoundingBox.Render();
+            }
             PostRender();
         }
         public override void Dispose()
