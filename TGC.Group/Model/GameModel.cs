@@ -1,6 +1,8 @@
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
+using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -9,13 +11,6 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
-using TGC.Core.SkeletalAnimation;
-using System.Collections.Generic;
-using TGC.Core.Collision;
-using System.Windows.Forms;
-using TGC.Examples.Example;
-using TGC.Examples.UserControls;
-using TGC.Examples.UserControls.Modifier;
 
 namespace TGC.Group.Model
 {
@@ -33,12 +28,9 @@ namespace TGC.Group.Model
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private const float MOVEMENT_SPEED = 200;
-        //private TgcMesh robot;
-        private TgcSkeletalMesh personajePrincipal;
-        private TgcThirdPersonCamera camaraInterna;
-        //TGCVector3 vectorCamara = new TGCVector3();
-        private List<TgcMesh> meshesDeLaEscena;
-
+        private TgcMesh robot;
+        private TgcThirdPersonCamera camara_interna;
+        TGCVector3 vectorCamara = new TGCVector3();
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -46,7 +38,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-       // private TgcMesh mesh;
+        // private TgcMesh mesh;
         private TgcScene scene;
 
         public override void Init()
@@ -57,175 +49,86 @@ namespace TGC.Group.Model
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
-            //robot = scene.Meshes[178];
-            //robot.AutoTransform = true;
+            robot = scene.Meshes[178];
+            robot.AutoTransform = true;
             /*foreach(TgcMesh m in scene.Meshes)
             {
                 m.RotateY(Geometry.DegreeToRadian(90));
                 m.updateBoundingBox();
             }*/
-            // robot.AutoUpdateBoundingBox = true;
-            //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
-
-            scene.Meshes[178].Dispose();
-
-            meshesDeLaEscena = new List<TgcMesh>();
-            foreach (TgcMesh mesh in scene.Meshes)
-            {
-                mesh.AutoTransform = true;
-                meshesDeLaEscena.Add(mesh);
-            }
-            var skeletalLoader = new TgcSkeletalLoader();
-            personajePrincipal = skeletalLoader.loadMeshAndAnimationsFromFile(MediaDir + "Trooper\\Trooper-TgcSkeletalMesh.xml", MediaDir + "Trooper\\", new[] { MediaDir + "Trooper\\TrooperRun-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperJump-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperMatrixJump-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperPush-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperStandBy-TgcSkeletalAnim.xml" });
-            personajePrincipal.playAnimation("TrooperRun", true);
-            personajePrincipal.AutoTransform = true;
-            personajePrincipal.Position = new TGCVector3(400, 0, 400);
-            personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
-
-            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), personajePrincipal.BoundingBox.calculateBoxCenter(), 140, 280);
-            Camara = camaraInterna;
-            camaraInterna.rotateY(Geometry.DegreeToRadian(180));
+            robot.AutoUpdateBoundingBox = true;
+            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(), 140, 280);
+            Camara = camara_interna;
+            camara_interna.rotateY(Geometry.DegreeToRadian(180));
         }
         public override void Update()
         {
             PreUpdate();
-            /*var input = Input;
+            var input = Input;
             var movement = TGCVector3.Empty;
-            //var originalPos = robot.Position;
+            var originalPos = robot.Position;
 
             movement.X = MovimientoDerecha(input) - MovimientoIzquierda(input);
             movement.Z = MovimientoArriba(input) - MovimientoAbajo(input);
-            movement *=  ElapsedTime;
-            //robot.Move(movement);
+            movement *= ElapsedTime;
+            robot.Move(movement);
+            robot.BoundingBox.move(movement);
 
-            //vectorCamara.X = robot.Position.X;
-            vectorCamara.X = personajePrincipal.Position.X;
-            //vectorCamara.Y = robot.Position.Y;
-            vectorCamara.Y = personajePrincipal.Position.Y;
-            //vectorCamara.Z = robot.Position.Z;
-            vectorCamara.Z = personajePrincipal.Position.Z;
-            //camara_interna.Target = vectorCamara;
-            */
-            var velocidadCaminar = 400;
-            var velocidadRotacion = 250;
-            var moveForward = 0f;
-            float rotate = 0;
-            var moving = false;
-            var rotating = false;
+            DetectarColisiones(originalPos);
 
-            //Adelante
-            if (Input.keyDown(Key.W))
-            {
-                moveForward = -velocidadCaminar;
-                moving = true;
-            }
+            vectorCamara.X = robot.Position.X;
+            vectorCamara.Y = robot.Position.Y;
+            vectorCamara.Z = robot.Position.Z;
+            camara_interna.Target = vectorCamara;
 
-            //Atras
-            if (Input.keyDown(Key.S))
-            {
-                moveForward = velocidadCaminar;
-                moving = true;
-            }
-
-            //Derecha
-            if (Input.keyDown(Key.D))
-            {
-                rotate = velocidadRotacion;
-                rotating = true;
-            }
-
-            //Izquierda
-            if (Input.keyDown(Key.A))
-            {
-                rotate = -velocidadRotacion;
-                rotating = true;
-            }
-
-            //Si hubo rotacion
-            if (rotating)
-            {
-                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                var rotAngle = Geometry.DegreeToRadian(rotate * ElapsedTime);
-                personajePrincipal.RotateY(rotAngle);
-                camaraInterna.rotateY(rotAngle);
-            }
-
-            //Si hubo desplazamiento
-            if (moving)
-            {
-                //Activar animacion de caminando
-                personajePrincipal.playAnimation("TrooperRun", true);
-
-                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
-                var lastPos = personajePrincipal.Position;
-
-                //La velocidad de movimiento tiene que multiplicarse por el elapsedTime para hacerse independiente de la velocida de CPU
-                //Ver Unidad 2: Ciclo acoplado vs ciclo desacoplado
-
-                //NO SE RECOMIENDA UTILIZAR! moveOrientedY mueve el personaje segun la direccion actual, realiza operaciones de seno y coseno.
-                personajePrincipal.MoveOrientedY(moveForward * ElapsedTime);
-
-                //Detectar colisiones
-                var collide = false;
-                //Guardamos los objetos colicionados para luego resolver la respuesta. (para este ejemplo simple es solo 1 caja)
-                TgcMesh collider = null;
-                foreach (TgcMesh mesh in meshesDeLaEscena)
-                {
-                    if (TgcCollisionUtils.testAABBAABB(personajePrincipal.BoundingBox, mesh.BoundingBox))
-                    {
-                        collide = true;
-                        collider = mesh;
-                        break;
-                    }
-                }
-
-                //Si hubo colision, restaurar la posicion anterior, CUIDADO!!!!!
-                //Hay que tener cuidado con este tipo de respuesta a colision, puede darse el caso que el objeto este parcialmente dentro en este y en el frame anterior.
-                //para solucionar el problema que tiene hacer este tipo de respuesta a colisiones y que los elementos no queden pegados hay varios algoritmos y hacks.
-                //almacenar la posicion anterior no es lo mejor para responder a una colision.
-                //Una primera aproximacion para evitar que haya inconsistencia es realizar sliding
-                if (collide)
-                {
-                    personajePrincipal.Position = lastPos; //Por como esta el framework actualmente esto actualiza el BoundingBox.
-                }
-
-                //Si no se esta moviendo, activar animacion de Parado
-                else
-                {
-                    personajePrincipal.playAnimation("TrooperStandBy", true);
-                }
-
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personajePrincipal.Position;
-
-                PostUpdate();
-            }
+            PostUpdate();
         }
 
         public override void Render()
         {
-
             PreRender();
-
             scene.RenderAll();
-            foreach (TgcMesh mesh in scene.Meshes)
+            foreach (TgcMesh m in scene.Meshes)
             {
-                mesh.BoundingBox.Render();
+                m.BoundingBox.Render();
             }
-
-            personajePrincipal.animateAndRender(ElapsedTime);
-            personajePrincipal.BoundingBox.Render();
-
             PostRender();
-
         }
         public override void Dispose()
         {
             scene.DisposeAll(); //Dispose de la escena.
-            personajePrincipal.Dispose(); //Dispose del personaje.
-
         }
-        /*
+
+        private void DetectarColisiones(TGCVector3 originalPos)
+        {
+            var collisionFound = false;
+
+            foreach (var mesh in scene.Meshes)
+            {
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = robot.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                if (mainMeshBoundingBox == sceneMeshBoundingBox)
+                    break;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+                {
+                    collisionFound = true;
+                    break;
+                }
+            }
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            if (collisionFound)
+            {
+                robot.Position = originalPos;
+            }
+        }
         private float MovimientoIzquierda(TgcD3dInput input)
         {
             return MovimientoXZ(input.keyDown(Key.Left) || input.keyDown(Key.A));
@@ -248,6 +151,5 @@ namespace TGC.Group.Model
                 return MOVEMENT_SPEED;
             return 0;
         }
-        */
     }
 }
