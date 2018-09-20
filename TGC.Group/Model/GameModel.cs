@@ -1,6 +1,8 @@
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
+using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -36,7 +38,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-       // private TgcMesh mesh;
+        // private TgcMesh mesh;
         private TgcScene scene;
 
         public override void Init()
@@ -55,7 +57,7 @@ namespace TGC.Group.Model
                 m.updateBoundingBox();
             }*/
             robot.AutoUpdateBoundingBox = true;
-            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
+            camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(), 140, 280);
             Camara = camara_interna;
             camara_interna.rotateY(Geometry.DegreeToRadian(180));
         }
@@ -68,8 +70,11 @@ namespace TGC.Group.Model
 
             movement.X = MovimientoDerecha(input) - MovimientoIzquierda(input);
             movement.Z = MovimientoArriba(input) - MovimientoAbajo(input);
-            movement *=  ElapsedTime;
+            movement *= ElapsedTime;
             robot.Move(movement);
+            robot.BoundingBox.move(movement);
+
+            DetectarColisiones(originalPos);
 
             vectorCamara.X = robot.Position.X;
             vectorCamara.Y = robot.Position.Y;
@@ -94,6 +99,36 @@ namespace TGC.Group.Model
             scene.DisposeAll(); //Dispose de la escena.
         }
 
+        private void DetectarColisiones(TGCVector3 originalPos)
+        {
+            var collisionFound = false;
+
+            foreach (var mesh in scene.Meshes)
+            {
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = robot.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                if (mainMeshBoundingBox == sceneMeshBoundingBox)
+                    break;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+                {
+                    collisionFound = true;
+                    break;
+                }
+            }
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            if (collisionFound)
+            {
+                robot.Position = originalPos;
+            }
+        }
         private float MovimientoIzquierda(TgcD3dInput input)
         {
             return MovimientoXZ(input.keyDown(Key.Left) || input.keyDown(Key.A));
