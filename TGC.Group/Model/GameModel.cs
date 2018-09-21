@@ -91,6 +91,8 @@ namespace TGC.Group.Model
             personajePrincipal.AutoTransform = true;
             personajePrincipal.Position = new TGCVector3(400, 0, 400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
+            //Probamos con escala? No sirve
+          //  personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 140, 280);
             Camara = camaraInterna;
