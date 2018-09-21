@@ -67,6 +67,7 @@ namespace TGC.Group.Model
             // robot.AutoUpdateBoundingBox = true;
             //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
 
+            scene.Meshes[178].BoundingBox.move(new TGCVector3(2000,30000,20000));
             scene.Meshes[178].Dispose();
 
             meshesDeLaEscena = new List<TgcMesh>();
@@ -89,12 +90,12 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
-            personajePrincipal.Position = new TGCVector3(400, 0, 400);
+            personajePrincipal.Position = new TGCVector3(400, 10, 400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
             //Probamos con escala? No sirve
           //  personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
-            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 140, 280);
+            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 480);
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
         }
@@ -178,40 +179,15 @@ namespace TGC.Group.Model
                 personajePrincipal.MoveOrientedY(moveForward * ElapsedTime);
 
                 //Detectar colisiones
-                var collide = false;
-                //Guardamos los objetos colicionados para luego resolver la respuesta. (para este ejemplo simple es solo 1 caja)
-                TgcMesh collider = null;
-                foreach (TgcMesh mesh in meshesDeLaEscena)
-                {
-                    if (TgcCollisionUtils.testAABBAABB(personajePrincipal.BoundingBox, mesh.BoundingBox))
-                    {
-                        collide = true;
-                        collider = mesh;
-                        break;
-                    }
-                }
+                DetectarColisiones(lastPos);
 
-                //Si hubo colision, restaurar la posicion anterior, CUIDADO!!!!!
-                //Hay que tener cuidado con este tipo de respuesta a colision, puede darse el caso que el objeto este parcialmente dentro en este y en el frame anterior.
-                //para solucionar el problema que tiene hacer este tipo de respuesta a colisiones y que los elementos no queden pegados hay varios algoritmos y hacks.
-                //almacenar la posicion anterior no es lo mejor para responder a una colision.
-                //Una primera aproximacion para evitar que haya inconsistencia es realizar sliding
-                if (collide)
-                {
-                    personajePrincipal.Position = lastPos; //Por como esta el framework actualmente esto actualiza el BoundingBox.
-                }
-
-                //Si no se esta moviendo, activar animacion de Parado
-                else
-                {
-                    personajePrincipal.playAnimation("Parado", true);
-                }
+               
 
                 //Hacer que la camara siga al personaje en su nueva posicion
                 camaraInterna.Target = personajePrincipal.Position;
 
-                PostUpdate();
             }
+            PostUpdate();
         }
 
         public override void Render()
@@ -236,6 +212,35 @@ namespace TGC.Group.Model
             scene.DisposeAll(); //Dispose de la escena.
             personajePrincipal.Dispose(); //Dispose del personaje.
 
+        }
+
+        private void DetectarColisiones(TGCVector3 lastPos)
+        {
+            var collisionFound = false;
+
+            foreach (var mesh in scene.Meshes)
+            {
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = personajePrincipal.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                if (mainMeshBoundingBox == sceneMeshBoundingBox)
+                    continue;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+                {
+                    collisionFound = true;
+                    break;
+                }
+            }
+            if (collisionFound)
+            {
+                personajePrincipal.Position = lastPos;
+            }
         }
         /*
         private float MovimientoIzquierda(TgcD3dInput input)
