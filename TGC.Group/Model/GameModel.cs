@@ -38,6 +38,10 @@ namespace TGC.Group.Model
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
         private List<TgcMesh> meshesDeLaEscena;
+        private float jumping;
+
+        private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
+        private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -67,9 +71,6 @@ namespace TGC.Group.Model
             // robot.AutoUpdateBoundingBox = true;
             //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
 
-            scene.Meshes[178].BoundingBox.move(new TGCVector3(2000,30000,20000));
-            scene.Meshes[178].Dispose();
-
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
@@ -90,14 +91,15 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
-            personajePrincipal.Position = new TGCVector3(400, 10, 400);
+            personajePrincipal.Position = new TGCVector3(400, 1, 400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
             //Probamos con escala? No sirve
-          //  personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+            //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
-            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 480);
+            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
+
         }
         public override void Update()
         {
@@ -123,8 +125,10 @@ namespace TGC.Group.Model
             var velocidadRotacion = 250;
             var moveForward = 0f;
             float rotate = 0;
+            float jump = 0;
             var moving = false;
             var rotating = false;
+
 
             //Adelante
             if (Input.keyDown(Key.W))
@@ -154,6 +158,17 @@ namespace TGC.Group.Model
                 rotating = true;
             }
 
+            if (Input.keyUp(Key.Space) && jumping < 30)
+            {
+                jumping = 5;
+            }
+            if (Input.keyUp(Key.Space) || jumping > 0)
+            {
+                jumping -= 5 * ElapsedTime;
+                jump = jumping;
+                moving = true;
+            }
+
             //Si hubo rotacion
             if (rotating)
             {
@@ -163,6 +178,7 @@ namespace TGC.Group.Model
                 camaraInterna.rotateY(rotAngle);
             }
 
+            //var movementVector = TGCVector3.Empty;
             //Si hubo desplazamiento
             if (moving)
             {
@@ -172,21 +188,40 @@ namespace TGC.Group.Model
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
 
-                //La velocidad de movimiento tiene que multiplicarse por el elapsedTime para hacerse independiente de la velocida de CPU
-                //Ver Unidad 2: Ciclo acoplado vs ciclo desacoplado
-
                 //NO SE RECOMIENDA UTILIZAR! moveOrientedY mueve el personaje segun la direccion actual, realiza operaciones de seno y coseno.
                 personajePrincipal.MoveOrientedY(moveForward * ElapsedTime);
+                
+
+                //movementVector = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump,               ESTO SE USA EN UN EJEMPLO DE COLISIONES, QUIZAS CONTEMPLA TEMA SALTO, QUE POR AHORA NO LOGRO HACER FUNCIONAR.
+                //FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
 
                 //Detectar colisiones
                 DetectarColisiones(lastPos);
 
-               
-
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personajePrincipal.Position;
-
+            }else
+            {
+                personajePrincipal.playAnimation("Parado", true);
             }
+
+            //Hacer que la camara siga al personaje en su nueva posicion
+            camaraInterna.Target = personajePrincipal.Position;
+
+            objectsBehind.Clear();
+            objectsInFront.Clear();
+            foreach (var mesh in scene.Meshes)
+            {
+                TGCVector3 colisionCamara;
+                if (TgcCollisionUtils.intersectSegmentAABB(Camara.Position, camaraInterna.Target, //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
+                    mesh.BoundingBox, out colisionCamara))                                        //HAY QUE VER DESPUES COMO EVITAMOS QUE LA CAMARA SE CHOQUE CON ELLOS, EN LOS EJEMPLOS USAN COLISION CON ESFERAS Y NO NOS SIRVE.
+                {
+                    objectsBehind.Add(mesh);
+                }
+                else
+                {
+                    objectsInFront.Add(mesh);
+                }
+            }
+
             PostUpdate();
         }
 
@@ -196,13 +231,13 @@ namespace TGC.Group.Model
             PreRender();
 
             scene.RenderAll();
-            foreach (TgcMesh mesh in scene.Meshes)
+            /*foreach (TgcMesh mesh in scene.Meshes)
             {
                 mesh.BoundingBox.Render();
-            }
+            }*/
 
             personajePrincipal.animateAndRender(ElapsedTime);
-            personajePrincipal.BoundingBox.Render();
+           // personajePrincipal.BoundingBox.Render();
 
             PostRender();
 
