@@ -76,13 +76,23 @@ namespace TGC.Group.Model
                 meshesDeLaEscena.Add(mesh);
             }
             var skeletalLoader = new TgcSkeletalLoader();
-            personajePrincipal = skeletalLoader.loadMeshAndAnimationsFromFile(MediaDir + "Trooper\\Trooper-TgcSkeletalMesh.xml", MediaDir + "Trooper\\", new[] { MediaDir + "Trooper\\TrooperRun-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperJump-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperMatrixJump-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperPush-TgcSkeletalAnim.xml", MediaDir + "Trooper\\TrooperStandBy-TgcSkeletalAnim.xml" });
-            personajePrincipal.playAnimation("TrooperRun", true);
+            personajePrincipal =
+                skeletalLoader.loadMeshAndAnimationsFromFile(
+                    MediaDir + "Robot\\Robot-TgcSkeletalMesh.xml",
+                    MediaDir + "Robot\\",
+                    new[]
+                    {
+                        MediaDir + "Robot\\Caminando-TgcSkeletalAnim.xml",
+                        MediaDir + "Robot\\Parado-TgcSkeletalAnim.xml",
+                        MediaDir + "Robot\\Empujar-TgcSkeletalAnim.xml",
+                    });
+            //Configurar animacion inicial
+            personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
             personajePrincipal.Position = new TGCVector3(400, 0, 400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
-            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), personajePrincipal.BoundingBox.calculateBoxCenter(), 140, 280);
+            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 140, 280);
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
         }
@@ -154,7 +164,7 @@ namespace TGC.Group.Model
             if (moving)
             {
                 //Activar animacion de caminando
-                personajePrincipal.playAnimation("TrooperRun", true);
+                personajePrincipal.playAnimation("Caminando", true);
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
@@ -192,7 +202,7 @@ namespace TGC.Group.Model
                 //Si no se esta moviendo, activar animacion de Parado
                 else
                 {
-                    personajePrincipal.playAnimation("TrooperStandBy", true);
+                    personajePrincipal.playAnimation("Parado", true);
                 }
 
                 //Hacer que la camara siga al personaje en su nueva posicion
