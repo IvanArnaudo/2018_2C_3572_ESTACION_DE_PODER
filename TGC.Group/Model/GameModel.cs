@@ -110,7 +110,7 @@ namespace TGC.Group.Model
                 var sceneMeshBoundingBox = mesh.BoundingBox;
 
                 if (mainMeshBoundingBox == sceneMeshBoundingBox)
-                    break;
+                    continue;
 
                 //Ejecutar algoritmo de detección de colisiones
                 var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
