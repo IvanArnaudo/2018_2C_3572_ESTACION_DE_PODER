@@ -211,8 +211,7 @@ namespace TGC.Group.Model
             foreach (var mesh in scene.Meshes)
             {
                 TGCVector3 colisionCamara;
-                if (TgcCollisionUtils.intersectSegmentAABB(Camara.Position, camaraInterna.Target, //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
-                    mesh.BoundingBox, out colisionCamara))                                        //HAY QUE VER DESPUES COMO EVITAMOS QUE LA CAMARA SE CHOQUE CON ELLOS, EN LOS EJEMPLOS USAN COLISION CON ESFERAS Y NO NOS SIRVE.
+                if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
                 {
                     objectsBehind.Add(mesh);
                 }
@@ -230,11 +229,16 @@ namespace TGC.Group.Model
 
             PreRender();
 
-            scene.RenderAll();
+            //scene.RenderAll();
             /*foreach (TgcMesh mesh in scene.Meshes)
             {
                 mesh.BoundingBox.Render();
             }*/
+
+            foreach (var mesh in objectsInFront)
+            {
+                mesh.Render();                                      //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+            }
 
             personajePrincipal.animateAndRender(ElapsedTime);
            // personajePrincipal.BoundingBox.Render();
