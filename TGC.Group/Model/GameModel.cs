@@ -40,10 +40,12 @@ namespace TGC.Group.Model
         //TGCVector3 vectorCamara = new TGCVector3();
         private List<TgcMesh> meshesDeLaEscena;
         private float jumping;
+        float jump = 0;
         private bool moving = false, enElPiso = true;
         private bool rotating = false;
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        TgcMesh currentCollision;
         //private readonly List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
 
        // private TgcBoundingSphere characterSphere;
@@ -136,7 +138,6 @@ namespace TGC.Group.Model
             //var velocidadRotacion = 250;
             var moveForward = 0f;
             float rotate = 0;
-            float jump = 0;
             moving = false;
 
             moveForward = MovimientoAbajo() - MovimientoArriba();
@@ -241,6 +242,15 @@ namespace TGC.Group.Model
         {
             var collisionFound = false;
 
+            if (currentCollision != null)
+            {
+                if (TgcCollisionUtils.classifyBoxBox(personajePrincipal.BoundingBox, currentCollision.BoundingBox) == TgcCollisionUtils.BoxBoxResult.Afuera)
+                    enElPiso = false;
+
+                if (currentCollision.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMin.Y)
+                    currentCollision = null;
+            }
+
             foreach (var mesh in scene.Meshes)
             {
                 //Los dos BoundingBox que vamos a testear
@@ -256,16 +266,28 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
-                    if (sceneMeshBoundingBox.Position.Y <= lastPos.Y)
+                    if (sceneMeshBoundingBox.PMax.Y <= lastPos.Y)
+                    {
+                        currentCollision = mesh;
                         enElPiso = true;
+                        jump = 0;
+                    }
 
                     collisionFound = true;
-                    break;
+                    //break;
                 }
             }
             if (collisionFound)
             {
                 personajePrincipal.Position = lastPos;
+                if (!enElPiso)
+                {
+                    jumping -= 2 * ElapsedTime;
+                    jump = jumping;
+                    moving = true;
+                    TGCVector3 MovimientoEnY = new TGCVector3(0, jump, 0);
+                    personajePrincipal.Move(MovimientoEnY);
+                }
             }
         }
         private float RotacionIzquierda()
