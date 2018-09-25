@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using TGC.Examples.Example;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Core.BoundingVolumes;
+using System.Reflection;
 
 namespace TGC.Group.Model
 {
@@ -31,14 +32,16 @@ namespace TGC.Group.Model
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
-        private const float MOVEMENT_SPEED = 200;
+        private float velocidadCaminar = 5;
+        private float velocidadRotacion = 250;
         private SphereCollisionManager collisionManager;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
         private List<TgcMesh> meshesDeLaEscena;
         private float jumping;
-
+        private bool moving = false, enElPiso = true;
+        private bool rotating = false;
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
         //private readonly List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
@@ -114,9 +117,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            /*var input = Input;
-            var movement = TGCVector3.Empty;
-            //var originalPos = robot.Position;
+            /*var originalPos = robot.Position;
 
             movement.X = MovimientoDerecha(input) - MovimientoIzquierda(input);
             movement.Z = MovimientoArriba(input) - MovimientoAbajo(input);
@@ -133,48 +134,20 @@ namespace TGC.Group.Model
             */
             //var velocidadCaminar = 400;
             //var velocidadRotacion = 250;
-            var velocidadCaminar = 5;
-            var velocidadRotacion = 250;
             var moveForward = 0f;
             float rotate = 0;
             float jump = 0;
-            var moving = false;
-            var rotating = false;
+            moving = false;
 
+            moveForward = MovimientoAbajo() - MovimientoArriba();
+            rotate = RotacionDerecha() - RotacionIzquierda();
 
-            //Adelante
-            if (Input.keyDown(Key.W))
-            {
-                moveForward = -velocidadCaminar;
-                moving = true;
-            }
-
-            //Atras
-            if (Input.keyDown(Key.S))
-            {
-                moveForward = velocidadCaminar;
-                moving = true;
-            }
-
-            //Derecha
-            if (Input.keyDown(Key.D))
-            {
-                rotate = velocidadRotacion;
-                rotating = true;
-            }
-
-            //Izquierda
-            if (Input.keyDown(Key.A))
-            {
-                rotate = -velocidadRotacion;
-                rotating = true;
-            }
-
-            if (Input.keyUp(Key.Space) && jumping < 2)
+            if (Input.keyUp(Key.Space) && enElPiso)
             {
                 jumping = 2;
+                enElPiso = false;
             }
-            if (Input.keyUp(Key.Space) || jumping > 0)
+            if (!enElPiso)
             {
                 jumping -= 2 * ElapsedTime;
                 jump = jumping;
@@ -205,9 +178,8 @@ namespace TGC.Group.Model
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 personajePrincipal.Move(Movimiento);
                 //MovimientoEnY = new TGCVector3(0, jump, 0);
-                //var gravedad = collisionManager.moveCharacter(characterSphere, MovimientoEnY, objetosColisionables); //Aca intento usar la sphereBoundingBox solo para la gravedad, que le viene por defecto, pero no funciona aun.
+                //TGCVector3 gravedad = new TGCVector3(0, -10, 0);
                 //personajePrincipal.Move(gravedad);
-                //Detectar colisiones
                 DetectarColisiones(lastPos);
 
             }else
@@ -284,6 +256,9 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
+                    if (sceneMeshBoundingBox.Position.Y <= lastPos.Y)
+                        enElPiso = true;
+
                     collisionFound = true;
                     break;
                 }
@@ -293,29 +268,41 @@ namespace TGC.Group.Model
                 personajePrincipal.Position = lastPos;
             }
         }
-        /*
-        private float MovimientoIzquierda(TgcD3dInput input)
+        private float RotacionIzquierda()
         {
-            return MovimientoXZ(input.keyDown(Key.Left) || input.keyDown(Key.A));
+            return Movimiento(Input.keyDown(Key.Left) || Input.keyDown(Key.A), "Rotacion");
         }
-        private float MovimientoDerecha(TgcD3dInput input)
+        private float RotacionDerecha()
         {
-            return MovimientoXZ(input.keyDown(Key.Right) || input.keyDown(Key.D));
+            return Movimiento(Input.keyDown(Key.Right) || Input.keyDown(Key.D), "Rotacion");
         }
-        private float MovimientoAbajo(TgcD3dInput input)
+        private float MovimientoAbajo()
         {
-            return MovimientoXZ(input.keyDown(Key.Down) || input.keyDown(Key.S));
+            return Movimiento(Input.keyDown(Key.Down) || Input.keyDown(Key.S), "Caminar");
         }
-        private float MovimientoArriba(TgcD3dInput input)
+        private float MovimientoArriba()
         {
-            return MovimientoXZ(input.keyDown(Key.Up) || input.keyDown(Key.W));
+            return Movimiento(Input.keyDown(Key.Up) || Input.keyDown(Key.W), "Caminar");
         }
-        private float MovimientoXZ(bool hayMovimiento)
+        private float Rotacion()
+        {
+            rotating = true;
+            return velocidadRotacion;
+        }
+        private float Caminar()
+        {
+            moving = true;
+            return velocidadCaminar;
+        }
+        private float Movimiento(bool hayMovimiento, string tipoMovimiento)
         {
             if (hayMovimiento)
-                return MOVEMENT_SPEED;
+               return CallFloatMethod(tipoMovimiento);
             return 0;
         }
-        */
+        private float CallFloatMethod(string methodName)
+        {
+            return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
+        }
     }
 }
