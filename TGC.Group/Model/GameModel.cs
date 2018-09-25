@@ -1,6 +1,5 @@
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
-using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -14,8 +13,8 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Windows.Forms;
 using TGC.Examples.Example;
-using TGC.Examples.UserControls;
-using TGC.Examples.UserControls.Modifier;
+using TGC.Examples.Collision.SphereCollision;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
@@ -33,7 +32,7 @@ namespace TGC.Group.Model
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private const float MOVEMENT_SPEED = 200;
-        //private TgcMesh robot;
+        private SphereCollisionManager collisionManager;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
@@ -42,6 +41,9 @@ namespace TGC.Group.Model
 
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        //private readonly List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
+
+       // private TgcBoundingSphere characterSphere;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -71,12 +73,20 @@ namespace TGC.Group.Model
             // robot.AutoUpdateBoundingBox = true;
             //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
 
+            //characterSphere = new TgcBoundingSphere(personajePrincipal.BoundingBox.calculateBoxCenter(), personajePrincipal.BoundingBox.calculateBoxRadius());
+
+            collisionManager = new SphereCollisionManager();
+            collisionManager.GravityEnabled = true;
+            collisionManager.GravityForce = new TGCVector3(0, -10, 0);
+
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
                 mesh.AutoTransform = true;
                 meshesDeLaEscena.Add(mesh);
+                //objetosColisionables.Add(mesh.BoundingBox);
             }
+
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
                 skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -121,7 +131,9 @@ namespace TGC.Group.Model
             vectorCamara.Z = personajePrincipal.Position.Z;
             //camara_interna.Target = vectorCamara;
             */
-            var velocidadCaminar = 400;
+            //var velocidadCaminar = 400;
+            //var velocidadRotacion = 250;
+            var velocidadCaminar = 5;
             var velocidadRotacion = 250;
             var moveForward = 0f;
             float rotate = 0;
@@ -158,13 +170,13 @@ namespace TGC.Group.Model
                 rotating = true;
             }
 
-            if (Input.keyUp(Key.Space) && jumping < 30)
+            if (Input.keyUp(Key.Space) && jumping < 2)
             {
-                jumping = 5;
+                jumping = 2;
             }
             if (Input.keyUp(Key.Space) || jumping > 0)
             {
-                jumping -= 5 * ElapsedTime;
+                jumping -= 2 * ElapsedTime;
                 jump = jumping;
                 moving = true;
             }
@@ -178,7 +190,8 @@ namespace TGC.Group.Model
                 camaraInterna.rotateY(rotAngle);
             }
 
-            //var movementVector = TGCVector3.Empty;
+            var Movimiento = TGCVector3.Empty;
+            var MovimientoEnY = TGCVector3.Empty;
             //Si hubo desplazamiento
             if (moving)
             {
@@ -187,14 +200,13 @@ namespace TGC.Group.Model
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
-
-                //NO SE RECOMIENDA UTILIZAR! moveOrientedY mueve el personaje segun la direccion actual, realiza operaciones de seno y coseno.
-                personajePrincipal.MoveOrientedY(moveForward * ElapsedTime);
                 
 
-                //movementVector = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump,               ESTO SE USA EN UN EJEMPLO DE COLISIONES, QUIZAS CONTEMPLA TEMA SALTO, QUE POR AHORA NO LOGRO HACER FUNCIONAR.
-                //FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
-
+                Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
+                personajePrincipal.Move(Movimiento);
+                //MovimientoEnY = new TGCVector3(0, jump, 0);
+                //var gravedad = collisionManager.moveCharacter(characterSphere, MovimientoEnY, objetosColisionables); //Aca intento usar la sphereBoundingBox solo para la gravedad, que le viene por defecto, pero no funciona aun.
+                //personajePrincipal.Move(gravedad);
                 //Detectar colisiones
                 DetectarColisiones(lastPos);
 

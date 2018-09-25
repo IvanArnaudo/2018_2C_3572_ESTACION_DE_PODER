@@ -81,7 +81,8 @@
     <Reference Include="TGC.Core, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TGC.Core.2.3.3\lib\net471\TGC.Core.dll</HintPath>
     </Reference>
-    <Reference Include="TGC.Examples">
+    <Reference Include="TGC.Examples, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\tgc-viewer-master\TGC.Examples\bin\Debug\TGC.Examples.dll</HintPath>
     </Reference>
   </ItemGroup>
