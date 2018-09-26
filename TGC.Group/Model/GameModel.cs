@@ -13,8 +13,6 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Windows.Forms;
 using TGC.Examples.Example;
-using TGC.Examples.Collision.SphereCollision;
-using TGC.Core.BoundingVolumes;
 using System.Reflection;
 
 namespace TGC.Group.Model
@@ -34,7 +32,6 @@ namespace TGC.Group.Model
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
-        private SphereCollisionManager collisionManager;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
@@ -44,7 +41,6 @@ namespace TGC.Group.Model
         private bool rotating = false;
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
-        //private readonly List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
 
        // private TgcBoundingSphere characterSphere;
 
@@ -76,18 +72,11 @@ namespace TGC.Group.Model
             // robot.AutoUpdateBoundingBox = true;
             //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
 
-            //characterSphere = new TgcBoundingSphere(personajePrincipal.BoundingBox.calculateBoxCenter(), personajePrincipal.BoundingBox.calculateBoxRadius());
-
-            collisionManager = new SphereCollisionManager();
-            collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = new TGCVector3(0, -10, 0);
-
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
                 mesh.AutoTransform = true;
                 meshesDeLaEscena.Add(mesh);
-                //objetosColisionables.Add(mesh.BoundingBox);
             }
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -164,7 +153,6 @@ namespace TGC.Group.Model
             }
 
             var Movimiento = TGCVector3.Empty;
-            var MovimientoEnY = TGCVector3.Empty;
             //Si hubo desplazamiento
             if (moving)
             {
@@ -177,9 +165,6 @@ namespace TGC.Group.Model
 
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 personajePrincipal.Move(Movimiento);
-                //MovimientoEnY = new TGCVector3(0, jump, 0);
-                //TGCVector3 gravedad = new TGCVector3(0, -10, 0);
-                //personajePrincipal.Move(gravedad);
                 DetectarColisiones(lastPos);
 
             }else
@@ -221,7 +206,7 @@ namespace TGC.Group.Model
 
             foreach (var mesh in objectsInFront)
             {
-                mesh.Render();                                      //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+                mesh.Render();                               //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
             personajePrincipal.animateAndRender(ElapsedTime);
