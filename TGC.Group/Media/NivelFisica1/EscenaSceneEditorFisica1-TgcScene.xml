@@ -1,5 +1,5 @@
 <tgcScene>
-  <name>EscenarioSceneEditorFisica1</name>
+  <name>EscenaSceneEditorFisica1</name>
   <texturesExport enabled="True" dir="Textures" />
   <lightmapExport enabled="False" dir="LightMaps" />
   <sceneBoundingBox min="[-6.8058,-600.1319,-14.0153]" max="[2610.046,600.2258,10005.47]" />
@@ -2807,14 +2807,14 @@
       </texCoordsLightMap>
     </mesh>
     <mesh name="Box" layer="" type="Original" matId="4" color="[1,1,1]" visibility="1.0" lightmap="">
-      <boundingBox min="[2455.466,-345.838,249.9523]" max="[2593.295,-332.0876,362.0182]" />
+      <boundingBox min="[2455.466,-220.838,249.9523]" max="[2593.295,-207.0876,362.0182]" />
       <coordinatesIdx count="36">0 1 2 2 3 0 4 5 6 6 7 4 0 3 5 5 4 0 3 2 6 6 5 3 2 1 7 7 6 2 1 0 4 4 7 1 </coordinatesIdx>
       <textCoordsIdx count="36">0 1 2 2 3 0 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 </textCoordsIdx>
       <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
       <matIds count="1">0 </matIds>
       <textCoordsLightMapIdx count="0">
       </textCoordsLightMapIdx>
-      <vertices count="24">2455.466 -345.838 249.9523 2455.466 -345.838 362.0182 2593.295 -345.838 362.0182 2593.295 -345.838 249.9523 2455.466 -332.0876 249.9523 2593.295 -332.0876 249.9523 2593.295 -332.0876 362.0182 2455.466 -332.0876 362.0182 </vertices>
+      <vertices count="24">2455.466 -220.838 249.9523 2455.466 -220.838 362.0182 2593.295 -220.838 362.0182 2593.295 -220.838 249.9523 2455.466 -207.0876 249.9523 2593.295 -207.0876 249.9523 2593.295 -207.0876 362.0182 2455.466 -207.0876 362.0182 </vertices>
       <normals count="24">0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 </normals>
       <texCoords count="8">1 0 1 -1 0 -1 0 0 </texCoords>
       <colors count="3">255 255 255 </colors>
@@ -2822,14 +2822,14 @@
       </texCoordsLightMap>
     </mesh>
     <mesh name="Box" layer="" type="Original" matId="4" color="[1,1,1]" visibility="1.0" lightmap="">
-      <boundingBox min="[2457.441,-342.238,523.1512]" max="[2595.27,-328.4876,635.2172]" />
+      <boundingBox min="[2457.441,-217.238,523.1512]" max="[2595.27,-203.4876,635.2172]" />
       <coordinatesIdx count="36">0 1 2 2 3 0 4 5 6 6 7 4 0 3 5 5 4 0 3 2 6 6 5 3 2 1 7 7 6 2 1 0 4 4 7 1 </coordinatesIdx>
       <textCoordsIdx count="36">0 1 2 2 3 0 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 </textCoordsIdx>
       <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
       <matIds count="1">0 </matIds>
       <textCoordsLightMapIdx count="0">
       </textCoordsLightMapIdx>
-      <vertices count="24">2457.441 -342.238 523.1512 2457.441 -342.238 635.2172 2595.27 -342.238 635.2172 2595.27 -342.238 523.1512 2457.441 -328.4876 523.1512 2595.27 -328.4876 523.1512 2595.27 -328.4876 635.2172 2457.441 -328.4876 635.2172 </vertices>
+      <vertices count="24">2457.441 -217.238 523.1512 2457.441 -217.238 635.2172 2595.27 -217.238 635.2172 2595.27 -217.238 523.1512 2457.441 -203.4876 523.1512 2595.27 -203.4876 523.1512 2595.27 -203.4876 635.2172 2457.441 -203.4876 635.2172 </vertices>
       <normals count="24">0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 </normals>
       <texCoords count="8">1 0 1 -1 0 -1 0 0 </texCoords>
       <colors count="3">255 255 255 </colors>

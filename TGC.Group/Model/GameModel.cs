@@ -32,6 +32,9 @@ namespace TGC.Group.Model
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
+        private float velocidadDesplazamientoPlataformas = 60f;
+        private float direccionDeMovimientoActual1 = 1f;
+        private float direccionDeMovimientoActual2 = -1f;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
@@ -41,6 +44,8 @@ namespace TGC.Group.Model
         private bool rotating = false;
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+
+        //private TgcMesh plataforma1, plataforma2;
 
        // private TgcBoundingSphere characterSphere;
 
@@ -93,7 +98,8 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
-            personajePrincipal.Position = new TGCVector3(400, 1, 400);
+            //personajePrincipal.Position = new TGCVector3(400, 1, 400);
+            personajePrincipal.Position = new TGCVector3(1800, -300, 300);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
             //Probamos con escala? No sirve
             //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
@@ -102,6 +108,8 @@ namespace TGC.Group.Model
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
+            //plataforma1 = scene.Meshes[165];
+            //plataforma2 = scene.Meshes[166];
         }
         public override void Update()
         {
@@ -123,6 +131,24 @@ namespace TGC.Group.Model
             */
             //var velocidadCaminar = 400;
             //var velocidadRotacion = 250;
+
+
+            //Animacion de las plataformas
+
+            scene.Meshes[165].Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual1 * ElapsedTime, 0);
+            if (FastMath.Abs(scene.Meshes[165].Position.Y) >360f)
+            {
+                direccionDeMovimientoActual1 *= -1;
+            }
+
+            scene.Meshes[166].Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual2 * ElapsedTime, 0);
+            if (FastMath.Abs(scene.Meshes[166].Position.Y) > 360f)
+            {
+                direccionDeMovimientoActual2 *= -1;
+            }
+
+            //Fin de animacion de las plataformas
+
             var moveForward = 0f;
             float rotate = 0;
             float jump = 0;
@@ -210,7 +236,9 @@ namespace TGC.Group.Model
             }
 
             personajePrincipal.animateAndRender(ElapsedTime);
-           // personajePrincipal.BoundingBox.Render();
+            //personajePrincipal.BoundingBox.Render();
+            //plataforma1.Render();
+            //plataforma2.Render();
 
             PostRender();
 
@@ -219,6 +247,8 @@ namespace TGC.Group.Model
         {
             scene.DisposeAll(); //Dispose de la escena.
             personajePrincipal.Dispose(); //Dispose del personaje.
+            //plataforma1.Dispose();
+            //plataforma2.Dispose();
 
         }
 
