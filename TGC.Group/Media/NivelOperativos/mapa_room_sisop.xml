@@ -1,0 +1,93 @@
+<roomsEditor-Map>
+  <mapSettings width="10000" height="10000" scaleX="1" scaleY="1" scaleZ="1" />
+  <rooms count="11">
+    <room name="Inicio" x="60" y="50" width="500" length="600" height="300" floorLevel="0">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="2" vTile="2" />
+      <wall name="Floor" textureName="baldosaFacultad.jpg" autoAdjustUv="True" uTile="4" vTile="4" />
+      <wall name="East" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="cuartoAlto" x="60" y="650" width="1000" length="400" height="1000" floorLevel="0">
+      <wall name="Roof" textureName="tierra.jpg" autoAdjustUv="False" uTile="10" vTile="10" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="False" uTile="10" vTile="10" />
+      <wall name="East" textureName="concretefloor1.JPG" autoAdjustUv="False" uTile="10" vTile="10" />
+      <wall name="West" textureName="concretefloor1.JPG" autoAdjustUv="False" uTile="10" vTile="10" />
+      <wall name="North" textureName="concretefloor1.JPG" autoAdjustUv="False" uTile="10" vTile="10" />
+      <wall name="South" textureName="concretefloor1.JPG" autoAdjustUv="False" uTile="10" vTile="10" />
+    </room>
+    <room name="altoRecepion" x="430" y="1050" width="600" length="600" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="baldosaFacultad.jpg" autoAdjustUv="True" uTile="4" vTile="4" />
+      <wall name="East" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="grande" x="1030" y="1460" width="1000" length="1900" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="4" vTile="4" />
+      <wall name="Floor" textureName="baldosaFacultad.jpg" autoAdjustUv="True" uTile="5" vTile="10" />
+      <wall name="East" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="desbloqueo" x="2030" y="3090" width="1000" length="1000" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="4" vTile="4" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="3" />
+      <wall name="East" textureName="adobe3.jpg" autoAdjustUv="True" uTile="10" vTile="10" />
+      <wall name="West" textureName="adobe3.jpg" autoAdjustUv="True" uTile="10" vTile="10" />
+      <wall name="North" textureName="adobe3.jpg" autoAdjustUv="True" uTile="10" vTile="10" />
+      <wall name="South" textureName="adobe3.jpg" autoAdjustUv="True" uTile="10" vTile="10" />
+    </room>
+    <room name="intermedioIzq" x="2230" y="2920" width="200" length="170" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="West" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="North" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="South" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+    </room>
+    <room name="pasilloIzq" x="2230" y="2420" width="1900" length="500" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="10" vTile="3" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="10" vTile="3" />
+      <wall name="East" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="West" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="North" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="South" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+    </room>
+    <room name="intermedioDer" x="2030" y="4090" width="150" length="190" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="West" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="North" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="South" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+    </room>
+    <room name="pasilloDer" x="280" y="4280" width="1900" length="500" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="2" vTile="1" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="East" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="West" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="North" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+      <wall name="South" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="3" vTile="1" />
+    </room>
+    <room name="final" x="3180" y="3290" width="1500" length="450" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="piso2.jpg" autoAdjustUv="True" uTile="10" vTile="3" />
+      <wall name="East" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="West" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="North" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="South" textureName="wallAula.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+    </room>
+    <room name="intermedioFinal" x="3030" y="3420" width="150" length="200" height="300" floorLevel="700">
+      <wall name="Roof" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="concretefloor1.JPG" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="West" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="North" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+      <wall name="South" textureName="adobe3.jpg" autoAdjustUv="True" uTile="3" vTile="10" />
+    </room>
+  </rooms>
+</roomsEditor-Map>
