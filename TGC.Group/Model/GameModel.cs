@@ -33,12 +33,13 @@ namespace TGC.Group.Model
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
-        private float direccionDeMovimientoActual1 = 1f;
-        private float direccionDeMovimientoActual2 = -1f;
+        private float direccionDeMovimientoActual = 1;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         //TGCVector3 vectorCamara = new TGCVector3();
         private List<TgcMesh> meshesDeLaEscena;
+        private List<TgcMesh> cajasMovibles;
+
         private float jumping;
         private bool moving = false, enElPiso = true;
         private bool rotating = false;
@@ -46,7 +47,8 @@ namespace TGC.Group.Model
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
         float jump = 0;
 
-        //private TgcMesh plataforma1, plataforma2;
+        private TgcMesh plataforma1;
+        private TgcMesh plataforma2;
 
        // private TgcBoundingSphere characterSphere;
 
@@ -68,22 +70,26 @@ namespace TGC.Group.Model
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
-            //robot = scene.Meshes[178];
-            //robot.AutoTransform = true;
-            /*foreach(TgcMesh m in scene.Meshes)
-            {
-                m.RotateY(Geometry.DegreeToRadian(90));
-                m.updateBoundingBox();
-            }*/
-            // robot.AutoUpdateBoundingBox = true;
-            //camara_interna = new TgcThirdPersonCamera(robot.BoundingBox.calculateBoxCenter(), robot.BoundingBox.calculateBoxCenter(),  140, 280);
-
+        
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
                 mesh.AutoTransform = true;
                 meshesDeLaEscena.Add(mesh);
             }
+
+            cajasMovibles = new List<TgcMesh>();
+            cajasMovibles.Add(scene.Meshes[136]);
+            cajasMovibles.Add(scene.Meshes[140]);
+            cajasMovibles.Add(scene.Meshes[141]);
+            cajasMovibles.Add(scene.Meshes[145]);
+            cajasMovibles.Add(scene.Meshes[146]);
+            cajasMovibles.Add(scene.Meshes[148]);
+            cajasMovibles.Add(scene.Meshes[152]);
+            cajasMovibles.Add(scene.Meshes[153]);
+            cajasMovibles.Add(scene.Meshes[155]);
+            cajasMovibles.Add(scene.Meshes[159]);
+
 
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
@@ -100,7 +106,7 @@ namespace TGC.Group.Model
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
             //personajePrincipal.Position = new TGCVector3(400, 1, 400);
-            personajePrincipal.Position = new TGCVector3(1800, -300, 300);
+            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
             //Probamos con escala? No sirve
             //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
@@ -109,45 +115,26 @@ namespace TGC.Group.Model
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
-            //plataforma1 = scene.Meshes[165];
-            //plataforma2 = scene.Meshes[166];
+            plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
+            plataforma2 = scene.Meshes[165];
         }
         public override void Update()
         {
             PreUpdate();
-            /*var originalPos = robot.Position;
-
-            movement.X = MovimientoDerecha(input) - MovimientoIzquierda(input);
-            movement.Z = MovimientoArriba(input) - MovimientoAbajo(input);
-            movement *=  ElapsedTime;
-            //robot.Move(movement);
-
-            //vectorCamara.X = robot.Position.X;
-            vectorCamara.X = personajePrincipal.Position.X;
-            //vectorCamara.Y = robot.Position.Y;
-            vectorCamara.Y = personajePrincipal.Position.Y;
-            //vectorCamara.Z = robot.Position.Z;
-            vectorCamara.Z = personajePrincipal.Position.Z;
-            //camara_interna.Target = vectorCamara;
-            */
-            //var velocidadCaminar = 400;
-            //var velocidadRotacion = 250;
-
-
+            velocidadCaminar = 5;
             //Animacion de las plataformas
-
-            scene.Meshes[165].Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual1 * ElapsedTime, 0);
-            if (FastMath.Abs(scene.Meshes[165].Position.Y) >360f)
+            
+            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * ElapsedTime, 0);
+            if (FastMath.Abs(plataforma1.Position.Y) > 360f)
             {
-                direccionDeMovimientoActual1 *= -1;
+                direccionDeMovimientoActual *= -1;
             }
 
-            scene.Meshes[166].Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual2 * ElapsedTime, 0);
-            if (FastMath.Abs(scene.Meshes[166].Position.Y) > 360f)
+            plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * ElapsedTime, 0);
+            if (FastMath.Abs(plataforma2.Position.Y) > 360f)
             {
-                direccionDeMovimientoActual2 *= -1;
+                direccionDeMovimientoActual *= -1;
             }
-
             //Fin de animacion de las plataformas
 
             var moveForward = 0f;
@@ -160,6 +147,7 @@ namespace TGC.Group.Model
 
             if (Input.keyUp(Key.Space) && enElPiso)
             {
+                
                 jumping = 2;
                 enElPiso = false;
                 moving = true;
@@ -167,6 +155,7 @@ namespace TGC.Group.Model
             }
             if (!enElPiso)
             {
+                velocidadCaminar = 3;
                 jumping -= 2 * ElapsedTime;
                 jump = jumping;
                 moving = true;
@@ -194,7 +183,7 @@ namespace TGC.Group.Model
                 var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
 
 
-
+                //velocidadCaminar = 5;
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 personajePrincipal.Move(Movimiento);
                 DetectarColisiones(lastPos, pminPersonaje);
@@ -253,8 +242,6 @@ namespace TGC.Group.Model
         {
             scene.DisposeAll(); //Dispose de la escena.
             personajePrincipal.Dispose(); //Dispose del personaje.
-            //plataforma1.Dispose();
-            //plataforma2.Dispose();
 
         }
 
@@ -264,15 +251,21 @@ namespace TGC.Group.Model
 
             foreach (var mesh in scene.Meshes)
             {
+                
                 //Los dos BoundingBox que vamos a testear
                 var mainMeshBoundingBox = personajePrincipal.BoundingBox;
                 var sceneMeshBoundingBox = mesh.BoundingBox;
-
+                
                 if (mainMeshBoundingBox == sceneMeshBoundingBox)
                     continue;
 
                 //Ejecutar algoritmo de detección de colisiones
                 var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                if (cajasMovibles.Contains(mesh))
+                {
+                    mesh.Move(5, 0, 5);
+                }
 
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
