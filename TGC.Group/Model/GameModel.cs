@@ -14,6 +14,8 @@ using TGC.Core.Collision;
 using System.Windows.Forms;
 using TGC.Examples.Example;
 using System.Reflection;
+using TGC.Examples.Collision.SphereCollision;
+using System;
 
 namespace TGC.Group.Model
 {
@@ -46,11 +48,14 @@ namespace TGC.Group.Model
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
         float jump = 0;
+        bool techo = false;
+        private SphereCollisionManager collisionManager;
+        private TgcMesh collider;
 
         private TgcMesh plataforma1;
         private TgcMesh plataforma2;
 
-       // private TgcBoundingSphere characterSphere;
+        // private TgcBoundingSphere characterSphere;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -77,18 +82,6 @@ namespace TGC.Group.Model
                 mesh.AutoTransform = true;
                 meshesDeLaEscena.Add(mesh);
             }
-
-            cajasMovibles = new List<TgcMesh>();
-            cajasMovibles.Add(scene.Meshes[136]);
-            cajasMovibles.Add(scene.Meshes[140]);
-            cajasMovibles.Add(scene.Meshes[141]);
-            cajasMovibles.Add(scene.Meshes[145]);
-            cajasMovibles.Add(scene.Meshes[146]);
-            cajasMovibles.Add(scene.Meshes[148]);
-            cajasMovibles.Add(scene.Meshes[152]);
-            cajasMovibles.Add(scene.Meshes[153]);
-            cajasMovibles.Add(scene.Meshes[155]);
-            cajasMovibles.Add(scene.Meshes[159]);
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -139,7 +132,6 @@ namespace TGC.Group.Model
 
             var moveForward = 0f;
             float rotate = 0;
-            jump = 0;
             moving = false;
 
             moveForward = MovimientoAbajo() - MovimientoArriba();
@@ -155,11 +147,13 @@ namespace TGC.Group.Model
             }
             if (!enElPiso)
             {
-                velocidadCaminar = 3;
+                velocidadCaminar = 1;
                 jumping -= 2 * ElapsedTime;
                 jump = jumping;
                 moving = true;
             }
+            else
+                jump = 0;
 
             //Si hubo rotacion
             if (rotating)
@@ -173,6 +167,9 @@ namespace TGC.Group.Model
 
             var Movimiento = TGCVector3.Empty;
             //Si hubo desplazamiento
+            float scale = 1;
+            if (!enElPiso)
+                scale = 0.4f;
             if (moving)
             {
                 //Activar animacion de caminando
@@ -181,12 +178,14 @@ namespace TGC.Group.Model
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
                 var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
-
+                var pmaxPersonaje = personajePrincipal.BoundingBox.PMax.Y;
 
                 //velocidadCaminar = 5;
-                Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
+                Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, 0, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
+                Movimiento.Scale(scale);
+                Movimiento.Y = jump;
                 personajePrincipal.Move(Movimiento);
-                DetectarColisiones(lastPos, pminPersonaje);
+                DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje);
 
             }else
             {
@@ -244,8 +243,35 @@ namespace TGC.Group.Model
             personajePrincipal.Dispose(); //Dispose del personaje.
 
         }
+        private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
+        {
+            var collisionFound = false;
 
-        private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje)
+            foreach (var mesh in scene.Meshes)
+            {
+
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = meshAProbar.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                if (mainMeshBoundingBox == sceneMeshBoundingBox)
+                    continue;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && mainMeshBoundingBox != personajePrincipal.BoundingBox)
+                {
+                    collisionFound = true;
+                }
+            }
+            if (collisionFound)
+            {
+                meshAProbar.Position = lastPos;
+            }
+        }
+
+        private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
         {
             var collisionFound = false;
 
@@ -262,10 +288,6 @@ namespace TGC.Group.Model
                 //Ejecutar algoritmo de detección de colisiones
                 var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
 
-                if (cajasMovibles.Contains(mesh))
-                {
-                    mesh.Move(5, 0, 5);
-                }
 
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
@@ -274,20 +296,72 @@ namespace TGC.Group.Model
                     {
                         enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 1;
-                        
+                        techo = false;
                     }
-
+                    else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje)
+                        techo = true;
                     collisionFound = true;
-                    break;
+                    collider = mesh;
+                    var movementRay = lastPos - personajePrincipal.Position;
+                    //Luego debemos clasificar sobre que plano estamos chocando y la direccion de movimiento
+                    //Para todos los casos podemos deducir que la normal del plano cancela el movimiento en dicho plano.
+                    //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
+
+                    var rs = TGCVector3.Empty;
+                    if (((personajePrincipal.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
+                        (personajePrincipal.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0)) &&
+                        ((personajePrincipal.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
+                        (personajePrincipal.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0)))
+                    {
+
+                        if (personajePrincipal.Position.X > collider.BoundingBox.PMin.X && personajePrincipal.Position.X < collider.BoundingBox.PMax.X)
+                        {
+                            rs = new TGCVector3(movementRay.X, movementRay.Y, 0);
+                        }
+                        if (personajePrincipal.Position.Z > collider.BoundingBox.PMin.Z && personajePrincipal.Position.Z < collider.BoundingBox.PMax.Z)
+                        {
+                            rs = new TGCVector3(0, movementRay.Y, movementRay.Z);
+                        }
+
+                        //Seria ideal sacar el punto mas proximo al bounding que colisiona y chequear con eso, en ves que con la posicion.
+                    }
+                    else
+                    {
+                        if ((personajePrincipal.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
+                            (personajePrincipal.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0))
+                        {
+                            rs = new TGCVector3(0, movementRay.Y, movementRay.Z);
+                        }
+                        if ((personajePrincipal.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
+                            (personajePrincipal.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0))
+                        {
+                            rs = new TGCVector3(movementRay.X, movementRay.Y, 0);
+                        }
+                    }
+                    rs.Scale(0.2f);
+                    personajePrincipal.Position = lastPos - rs;
+                    if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
+                    {
+                        var lastCajaPos = mesh.Position;
+                        if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
+                            mesh.Move(5* Math.Sign(movementRay.X)*-1,0,0);
+                        else
+                            mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
+                        DetectarColisionesMovibles(lastCajaPos, mesh);
+                    }
+                    //break;
                 }
             }
             if (collisionFound)
             {
-                if (!enElPiso)
-                    
-                lastPos.Y += jump*ElapsedTime;
-                personajePrincipal.Position = lastPos;
-
+                /*if (!enElPiso)
+                {
+                    if (techo)
+                        jump = -2 * ElapsedTime;
+                    lastPos.Y += jump;
+                }
+                personajePrincipal.Position = lastPos;*/
+                
             }
             else
                 enElPiso = false;
