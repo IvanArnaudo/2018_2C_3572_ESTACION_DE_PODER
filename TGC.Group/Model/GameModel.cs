@@ -162,6 +162,8 @@ namespace TGC.Group.Model
             {
                 jumping = 2;
                 enElPiso = false;
+                moving = true;
+
             }
             if (!enElPiso)
             {
@@ -177,6 +179,7 @@ namespace TGC.Group.Model
                 var rotAngle = Geometry.DegreeToRadian(rotate * ElapsedTime);
                 personajePrincipal.RotateY(rotAngle);
                 camaraInterna.rotateY(rotAngle);
+
             }
 
             var Movimiento = TGCVector3.Empty;
@@ -278,6 +281,7 @@ namespace TGC.Group.Model
                     {
                         enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 1;
+                        
                     }
 
                     collisionFound = true;
@@ -287,13 +291,15 @@ namespace TGC.Group.Model
             if (collisionFound)
             {
                 if (!enElPiso)
-                    lastPos.Y += jump;
+                    
+                lastPos.Y += jump*ElapsedTime;
                 personajePrincipal.Position = lastPos;
 
             }
             else
                 enElPiso = false;
         }
+
         private float RotacionIzquierda()
         {
             return Movimiento(Input.keyDown(Key.Left) || Input.keyDown(Key.A), "Rotacion");
