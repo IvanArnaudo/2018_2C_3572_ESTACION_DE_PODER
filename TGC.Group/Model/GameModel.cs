@@ -188,13 +188,13 @@ namespace TGC.Group.Model
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
-                var a = personajePrincipal.BoundingBox.PMin.Y;
+                var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
 
 
 
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 personajePrincipal.Move(Movimiento);
-                DetectarColisiones(lastPos, a);
+                DetectarColisiones(lastPos, pminPersonaje);
 
             }else
             {
@@ -255,7 +255,7 @@ namespace TGC.Group.Model
 
         }
 
-        private void DetectarColisiones(TGCVector3 lastPos, float y)
+        private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje)
         {
             var collisionFound = false;
 
@@ -274,8 +274,11 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
-                    if (sceneMeshBoundingBox.PMax.Y <= y)
+                    if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje)
+                    {
                         enElPiso = true;
+                        lastPos.Y = sceneMeshBoundingBox.PMax.Y + 1;
+                    }
 
                     collisionFound = true;
                     break;
