@@ -44,6 +44,7 @@ namespace TGC.Group.Model
         private bool rotating = false;
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        float jump = 0;
 
         //private TgcMesh plataforma1, plataforma2;
 
@@ -151,7 +152,7 @@ namespace TGC.Group.Model
 
             var moveForward = 0f;
             float rotate = 0;
-            float jump = 0;
+            jump = 0;
             moving = false;
 
             moveForward = MovimientoAbajo() - MovimientoArriba();
@@ -187,11 +188,13 @@ namespace TGC.Group.Model
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
-                
+                var a = personajePrincipal.BoundingBox.PMin.Y;
+
+
 
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, jump, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 personajePrincipal.Move(Movimiento);
-                DetectarColisiones(lastPos);
+                DetectarColisiones(lastPos, a);
 
             }else
             {
@@ -252,7 +255,7 @@ namespace TGC.Group.Model
 
         }
 
-        private void DetectarColisiones(TGCVector3 lastPos)
+        private void DetectarColisiones(TGCVector3 lastPos, float y)
         {
             var collisionFound = false;
 
@@ -271,7 +274,7 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
-                    if (sceneMeshBoundingBox.Position.Y <= lastPos.Y)
+                    if (sceneMeshBoundingBox.PMax.Y <= y)
                         enElPiso = true;
 
                     collisionFound = true;
@@ -280,8 +283,13 @@ namespace TGC.Group.Model
             }
             if (collisionFound)
             {
+                if (!enElPiso)
+                    lastPos.Y += jump;
                 personajePrincipal.Position = lastPos;
+
             }
+            else
+                enElPiso = false;
         }
         private float RotacionIzquierda()
         {
