@@ -2,19 +2,13 @@ using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Textures;
 using TGC.Examples.Camara;
 using TGC.Core.SkeletalAnimation;
 using System.Collections.Generic;
 using TGC.Core.Collision;
-using System.Windows.Forms;
-using TGC.Examples.Example;
 using System.Reflection;
-using TGC.Examples.Collision.SphereCollision;
 using System;
 
 namespace TGC.Group.Model
@@ -35,25 +29,27 @@ namespace TGC.Group.Model
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
+        private float velocidadDesplazamientolibros = 10f;
+
         private float direccionDeMovimientoActual = 1;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
-        //TGCVector3 vectorCamara = new TGCVector3();
         private List<TgcMesh> meshesDeLaEscena;
-        private List<TgcMesh> cajasMovibles;
 
         private float jumping;
         private bool moving = false, enElPiso = true;
         private bool rotating = false;
-        private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
-        private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        private List<TgcMesh> objectsBehind = new List<TgcMesh>();
+        private List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        private List<TgcMesh> librosAgarrados = new List<TgcMesh>();
         float jump = 0;
         bool techo = false;
-        private SphereCollisionManager collisionManager;
         private TgcMesh collider;
 
         private TgcMesh plataforma1;
         private TgcMesh plataforma2;
+
+        private int cantidadDeLibros = 0;
 
         // private TgcBoundingSphere characterSphere;
 
@@ -83,6 +79,7 @@ namespace TGC.Group.Model
                 meshesDeLaEscena.Add(mesh);
             }
 
+            //Console.WriteLine("el nombre del mesh buscado es: " + scene.Meshes[200].Name);
 
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
@@ -98,8 +95,8 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
-            //personajePrincipal.Position = new TGCVector3(400, 1, 400);
-            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            personajePrincipal.Position = new TGCVector3(400, 1, 400);
+            //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
             //Probamos con escala? No sirve
             //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
@@ -128,6 +125,19 @@ namespace TGC.Group.Model
             {
                 direccionDeMovimientoActual *= -1;
             }
+
+            /*foreach (TgcMesh libro in scene.Meshes) {
+                var posicionInicialDelLibro = libro.Position.Y;
+                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
+                {
+                    libro.Move(0, velocidadDesplazamientolibros * direccionDeMovimientoActual * ElapsedTime, 0);         POR AHORA NO LO HAGO, HAY QUE REMODELAR LOS LIBROS DE FISICA 1 PARA QUE TOME CORRECTAMENTE LA ROTACION.
+                    if (FastMath.Abs(libro.Position.Y) > 100f || posicionInicialDelLibro == 0)
+                    {
+                        direccionDeMovimientoActual *= -1;
+                    }
+                    //libro.RotateY(velocidadRotacionlibros * ElapsedTime);
+                }
+            }*/
             //Fin de animacion de las plataformas
 
             var moveForward = 0f;
@@ -140,7 +150,7 @@ namespace TGC.Group.Model
             if (Input.keyUp(Key.Space) && enElPiso)
             {
                 
-                jumping = 2;
+                jumping = 2.5f;
                 enElPiso = false;
                 moving = true;
 
@@ -148,7 +158,7 @@ namespace TGC.Group.Model
             if (!enElPiso)
             {
                 velocidadCaminar = 1;
-                jumping -= 2 * ElapsedTime;
+                jumping -= 2.5f * ElapsedTime;
                 jump = jumping;
                 moving = true;
             }
@@ -226,22 +236,26 @@ namespace TGC.Group.Model
 
             foreach (var mesh in objectsInFront)
             {
-                mesh.Render();                               //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+                if (!librosAgarrados.Contains(mesh)) {
+                    mesh.Render();
+                }                                                   //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
             personajePrincipal.animateAndRender(ElapsedTime);
-            //personajePrincipal.BoundingBox.Render();
-            //plataforma1.Render();
-            //plataforma2.Render();
 
             PostRender();
 
         }
         public override void Dispose()
         {
-            scene.DisposeAll(); //Dispose de la escena.
-            personajePrincipal.Dispose(); //Dispose del personaje.
 
+            foreach (TgcMesh mesh in scene.Meshes) {
+                if (!librosAgarrados.Contains(mesh)) {
+                    mesh.Dispose();
+                }
+            }
+            personajePrincipal.Dispose(); //Dispose del personaje.
+            //scene.DisposeAll(); //Dispose de la escena.
         }
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
@@ -349,7 +363,14 @@ namespace TGC.Group.Model
                             mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
                         DetectarColisionesMovibles(lastCajaPos, mesh);
                     }
-                    //break;
+
+                    if (mesh.Name == "Box_1" && !librosAgarrados.Contains(mesh)) {
+                        librosAgarrados.Add(mesh);
+                        cantidadDeLibros++;
+                        mesh.BoundingBox = new Core.BoundingVolumes.TgcBoundingAxisAlignBox();
+                        mesh.Dispose();
+                    }
+                    //Console.WriteLine("Agarraste: " + cantidadDeLibros + " libros en total");
                 }
             }
             if (collisionFound)
