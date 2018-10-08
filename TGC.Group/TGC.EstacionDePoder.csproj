@@ -98,7 +98,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Escenarios\Menu.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Interfaz\Boton.cs" />
+    <Compile Include="Model\Interfaz\Menu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
