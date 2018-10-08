@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         private List<TgcMesh> meshesDeLaEscena;
 
         private float jumping;
-        private bool moving = false, enElPiso = true;
+        private bool moving = false;
         private bool rotating = false;
         private List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private List<TgcMesh> objectsInFront = new List<TgcMesh>();
@@ -114,9 +114,6 @@ namespace TGC.Group.Model
             plataforma2 = scene.Meshes[165];
             plataformasMovibles.Add(plataforma1);
             plataformasMovibles.Add(plataforma2);
-
-            plataforma1.AutoTransform = true;
-            plataforma2.AutoTransform = true;
         }
         public override void Update()
         {
@@ -181,7 +178,7 @@ namespace TGC.Group.Model
             var Movimiento = TGCVector3.Empty;
             //Si hubo desplazamiento
             float scale = 1;
-            if (!enElPiso)
+            if (!enElPiso())
                 scale = 0.4f;
             if (moving)
             {
@@ -290,8 +287,7 @@ namespace TGC.Group.Model
 
         private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
         {
-            var collisionFound = false;
-
+            var lastCollide = false;
             foreach (var mesh in scene.Meshes)
             {
                 
@@ -309,17 +305,19 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
-                    if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje)
+                    if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje +10)
                     {
-                        enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 3;
                         techo = false;
                         floorCollider = mesh;
                     }
                     else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje)
                         techo = true;
+
+                    if (floorCollider != null && sceneMeshBoundingBox == floorCollider.BoundingBox)
+                        lastCollide = true;
+
                     collider = mesh;
-                    collisionFound = true;
 
                     var movementRay = lastPos - personajePrincipal.Position;
                     //Luego debemos clasificar sobre que plano estamos chocando y la direccion de movimiento
@@ -332,34 +330,27 @@ namespace TGC.Group.Model
 
                     AgarrarLibros(mesh);
                 }
+                if (lastCollide == false)
+                    floorCollider = null;
             }
-            if (collisionFound)
-            {
-                /*if (!enElPiso)
-                {
-                    if (techo)
-                        jump = -2 * ElapsedTime;
-                    lastPos.Y += jump;
-                }
-                personajePrincipal.Position = lastPos;*/
-                
-            }
-            else
-                enElPiso = false;
+
         }
         private void Salto()
         {
-            if (Input.keyUp(Key.Space) && enElPiso)
+            if (Input.keyUp(Key.Space) && enElPiso())
             {
                 jumping = 2.5f;
-                enElPiso = false;
                 moving = true;
 
             }
         }
+        private bool enElPiso()
+        {
+            return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
+        }
         private void AplicarGravedad()
         {
-            if (!enElPiso)
+            if (!enElPiso())
             {
                 velocidadCaminar = 1;
                 jumping -= 2.5f * ElapsedTime;
@@ -463,8 +454,9 @@ namespace TGC.Group.Model
             }
 
             rs.Scale(0.2f);
+            if (!enElPiso())
+              rs.Y = -jump;
             personajePrincipal.Position = lastPos - rs;
-
         }
     }
 }
