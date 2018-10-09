@@ -1,4 +1,4 @@
-﻿using TGC.Core.Input;
+﻿/*using TGC.Core.Input;
 using System.Drawing;
 using System;
 
@@ -44,3 +44,4 @@ namespace TGC.Group.Model.Interfaz
 
     }
 }
+*/

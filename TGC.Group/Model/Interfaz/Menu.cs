@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+﻿/*using System.Windows.Forms;
 using TGC.Core.Direct3D;
 using TGC.Core.SceneLoader;
 using TGC.Core.Input;
@@ -29,9 +29,9 @@ namespace TGC.Group.Model.Interfaz
             texto.changeFont(fuente);
 
             tamanio = TextRenderer.MeasureText(texto.Text, fuente);
-            tamanio.Width = (int)(tamanio.Width/* * 1.5*/);
+            tamanio.Width = (int)(tamanio.Width/* * 1.5*///); MIRA QUE ACA LE AGREGUE DOS BARRAS AL FINAL PARA COMENTAR TODO.
 
-            texto.Size = tamanio;
+            /*texto.Size = tamanio;
 
             var vp = D3DDevice.Instance.Device.Viewport;
             texto.Position = new Point(
@@ -63,3 +63,4 @@ namespace TGC.Group.Model.Interfaz
     }
 }
 
+*/

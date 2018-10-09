@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using TGC.Group.Model.Interfaz;
 using TGC.Core.Textures;
 using Microsoft.DirectX.Direct3D;
@@ -20,8 +20,8 @@ namespace TGC.Group.Model.Escenarios
 
         public void init(string mediaDir, string shaderDir)
         {
-            inicio = new Boton("Inicio", 0f, 0.8f, /*() => EscenaManager.getInstance().addScene(new GameEscena())*/);
-            sprite = new Sprite(D3DDevice.Instance.Device);
+            inicio = new Boton("Inicio", 0f, 0.8f, /*() => EscenaManager.getInstance().addScene(new GameEscena())*///);  LE AGREGUE DOS BARRAS AL FINAL ACA TAMBIEN
+       /*     sprite = new Sprite(D3DDevice.Instance.Device);
             trustMe = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "imgMenu.png");
         }
 
@@ -60,4 +60,4 @@ namespace TGC.Group.Model.Escenarios
     }
 
 
-}
+}*/

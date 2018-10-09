@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Reflection;
 using System;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -52,6 +53,10 @@ namespace TGC.Group.Model
         private TgcMesh plataforma1;
         private TgcMesh plataforma2;
 
+        private TgcMp3Player reproductorMp3 = new TgcMp3Player();
+        //private string archivoActual;
+        private string pathDeLaCancion;
+
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
 
         private int cantidadDeLibros = 0;
@@ -76,7 +81,9 @@ namespace TGC.Group.Model
             //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
-        
+
+            pathDeLaCancion = MediaDir + "Musica\\ElEstudiante.mp3";
+
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
@@ -114,6 +121,8 @@ namespace TGC.Group.Model
             plataforma2 = scene.Meshes[165];
             plataformasMovibles.Add(plataforma1);
             plataformasMovibles.Add(plataforma2);
+
+            reproductorMp3.FileName = pathDeLaCancion;
         }
         public override void Update()
         {
@@ -234,6 +243,8 @@ namespace TGC.Group.Model
                 mesh.BoundingBox.Render();
             }*/
 
+            reproducirMusica();
+
             foreach (var mesh in objectsInFront)
             {
                 if (!librosAgarrados.Contains(mesh)) {
@@ -256,6 +267,8 @@ namespace TGC.Group.Model
             }
             personajePrincipal.Dispose(); //Dispose del personaje.
             //scene.DisposeAll(); //Dispose de la escena.
+
+            reproductorMp3.closeFile();
         }
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
@@ -376,6 +389,29 @@ namespace TGC.Group.Model
         {
             return Movimiento(Input.keyDown(Key.Up) || Input.keyDown(Key.W), "Caminar");
         }
+        private void reproducirMusica()
+        {
+            var estadoActual = reproductorMp3.getStatus();
+            if (Input.keyPressed(Key.M))
+            {
+                if (estadoActual == TgcMp3Player.States.Open)
+                {
+                    //Reproducir MP3
+                    reproductorMp3.play(true);
+                }
+                if (estadoActual == TgcMp3Player.States.Stopped)
+                {
+                    //Parar y reproducir MP3
+                    reproductorMp3.closeFile();
+                    reproductorMp3.play(true);
+                }
+                if (estadoActual == TgcMp3Player.States.Playing)
+                {
+                    //Parar el MP3
+                    reproductorMp3.stop();
+                }
+            }
+        }
         private float Rotacion()
         {
             rotating = true;
@@ -458,5 +494,19 @@ namespace TGC.Group.Model
               rs.Y = -jump;
             personajePrincipal.Position = lastPos - rs;
         }
+
+        /*private void cargarCancion(string direccionDeArchivo)
+        {
+            if (archivoActual == null || archivoActual != direccionDeArchivo)
+            {
+                archivoActual = direccionDeArchivo;                                     Esto es para cargar a otra cancion en el transcurso del juego, lo dejo aca por si interesa en un futuro.
+
+                //Cargar archivo de la cancion
+                reproductorMp3.closeFile();
+                reproductorMp3.FileName = archivoActual;
+            }
+        }*/
+
+
     }
 }
