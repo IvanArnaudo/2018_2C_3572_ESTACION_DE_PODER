@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using TGC.Group.Model.Interfaz;
 using TGC.Core.Textures;
 using Microsoft.DirectX.Direct3D;
@@ -11,23 +11,24 @@ using Microsoft.DirectX;
 
 namespace TGC.Group.Model.Escenarios
 {
-    class Menu
+    class Menu : Escenario
     {
-        private Boton inicio;
+        //private Action cargarNivel1 = () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameModel());
+        //private Boton inicio;
         private Sprite sprite;
         private TgcTexture trustMe;
         private Viewport vp = D3DDevice.Instance.Device.Viewport;
 
         public void init(string mediaDir, string shaderDir)
         {
-            inicio = new Boton("Inicio", 0f, 0.8f, /*() => EscenaManager.getInstance().addScene(new GameEscena())*///);  LE AGREGUE DOS BARRAS AL FINAL ACA TAMBIEN
-       /*     sprite = new Sprite(D3DDevice.Instance.Device);
+            //inicio = new Boton("Inicio", 0f, 0.8f, cargarNivel1);
+            sprite = new Sprite(D3DDevice.Instance.Device);
             trustMe = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "imgMenu.png");
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara)
         {
-            inicio.Update(deltaTime, input);
+          //  inicio.Update(deltaTime, input);
         }
 
 
@@ -45,14 +46,14 @@ namespace TGC.Group.Model.Escenarios
 
             sprite.End();
 
-            inicio.Render();
+         //   inicio.Render();
         }
 
 
 
         public void dispose()
         {
-            inicio.Dispose();
+         //   inicio.Dispose();
         }
 
 
@@ -60,4 +61,4 @@ namespace TGC.Group.Model.Escenarios
     }
 
 
-}*/
+}
