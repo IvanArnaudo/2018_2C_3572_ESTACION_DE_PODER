@@ -492,7 +492,7 @@ namespace TGC.Group.Model
             rs.Scale(0.2f);
             if (!enElPiso())
               rs.Y = -jump;
-            personajePrincipal.Position = lastPos - rs;
+            personajePrincipal.Position = lastPos;
         }
 
         /*private void cargarCancion(string direccionDeArchivo)
