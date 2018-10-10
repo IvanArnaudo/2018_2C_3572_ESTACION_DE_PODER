@@ -30,7 +30,7 @@ namespace TGC.Group.Model
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
-        private float velocidadDesplazamientolibros = 10f;
+        private float velocidadDesplazamientolibros = 75f;
 
         private float direccionDeMovimientoActual = 1;
         private TgcSkeletalMesh personajePrincipal;
@@ -60,8 +60,8 @@ namespace TGC.Group.Model
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
 
         private int cantidadDeLibros = 0;
-
-        // private TgcBoundingSphere characterSphere;
+        private float incremento = 0f;
+        private float distanciaRecorrida = 0f;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -70,7 +70,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-       // private TgcMesh mesh;
+        // private TgcMesh mesh;
         private TgcScene scene;
 
         public override void Init()
@@ -91,8 +91,6 @@ namespace TGC.Group.Model
                 meshesDeLaEscena.Add(mesh);
             }
 
-            //Console.WriteLine("el nombre del mesh buscado es: " + scene.Meshes[200].Name);
-
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
                 skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -107,22 +105,21 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
-            personajePrincipal.Position = new TGCVector3(400, 1, 400);
-            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            personajePrincipal.Position = new TGCVector3(400, 1, 9400);
+            //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
-            //Probamos con escala? No sirve
-            //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
             Camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
-            plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
+            plataforma1 = scene.Meshes[164];
             plataforma2 = scene.Meshes[165];
             plataformasMovibles.Add(plataforma1);
             plataformasMovibles.Add(plataforma2);
 
             reproductorMp3.FileName = pathDeLaCancion;
+            reproductorMp3.play(true);
         }
         public override void Update()
         {
@@ -130,7 +127,9 @@ namespace TGC.Group.Model
             velocidadCaminar = 5;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
+
             //Animacion de las plataformas
+
             plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * ElapsedTime, 0);
             if (FastMath.Abs(plataforma1.Position.Y) > 360f)
             {
@@ -143,19 +142,37 @@ namespace TGC.Group.Model
                 direccionDeMovimientoActual *= -1;
             }
 
+            //Fin de animacion de las plataformas
+
+            //Animacion de los libros de F1
+
+            foreach (TgcMesh libro in scene.Meshes)
+            {
+                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
+                {
+                    incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * ElapsedTime;
+                    libro.Move(0, incremento, 0);
+                    distanciaRecorrida = distanciaRecorrida + incremento;
+                    if (Math.Abs(distanciaRecorrida) > 1800f)
+                    {
+                        direccionDeMovimientoActual *= -1;
+                    }
+                }
+            }
+
             /*foreach (TgcMesh libro in scene.Meshes) {
                 var posicionInicialDelLibro = libro.Position.Y;
                 if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
                 {
-                    libro.Move(0, velocidadDesplazamientolibros * direccionDeMovimientoActual * ElapsedTime, 0);         POR AHORA NO LO HAGO, HAY QUE REMODELAR LOS LIBROS DE FISICA 1 PARA QUE TOME CORRECTAMENTE LA ROTACION.
+                    libro.Move(0, velocidadDesplazamientolibros  direccionDeMovimientoActual  ElapsedTime, 0);         //Otra forma de mover los libros
                     if (FastMath.Abs(libro.Position.Y) > 100f || posicionInicialDelLibro == 0)
                     {
                         direccionDeMovimientoActual *= -1;
                     }
-                    //libro.RotateY(velocidadRotacionlibros * ElapsedTime);
                 }
             }*/
-            //Fin de animacion de las plataformas
+
+            //Fin de Animacion de los libros de F1
 
             var moveForward = 0f;
             float rotate = 0;
@@ -206,7 +223,8 @@ namespace TGC.Group.Model
                 personajePrincipal.Move(Movimiento);
                 DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje);
 
-            }else
+            }
+            else
             {
                 personajePrincipal.playAnimation("Parado", true);
             }
@@ -247,7 +265,8 @@ namespace TGC.Group.Model
 
             foreach (var mesh in objectsInFront)
             {
-                if (!librosAgarrados.Contains(mesh)) {
+                if (!librosAgarrados.Contains(mesh))
+                {
                     mesh.Render();
                 }                                                   //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
@@ -260,8 +279,10 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
 
-            foreach (TgcMesh mesh in scene.Meshes) {
-                if (!librosAgarrados.Contains(mesh)) {
+            foreach (TgcMesh mesh in scene.Meshes)
+            {
+                if (!librosAgarrados.Contains(mesh))
+                {
                     mesh.Dispose();
                 }
             }
@@ -303,11 +324,11 @@ namespace TGC.Group.Model
             var lastCollide = false;
             foreach (var mesh in scene.Meshes)
             {
-                
+
                 //Los dos BoundingBox que vamos a testear
                 var mainMeshBoundingBox = personajePrincipal.BoundingBox;
                 var sceneMeshBoundingBox = mesh.BoundingBox;
-                
+
                 if (mainMeshBoundingBox == sceneMeshBoundingBox)
                     continue;
 
@@ -318,7 +339,7 @@ namespace TGC.Group.Model
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
-                    if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje +10)
+                    if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
                     {
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 3;
                         techo = false;
@@ -425,7 +446,7 @@ namespace TGC.Group.Model
         private float Movimiento(bool hayMovimiento, string tipoMovimiento)
         {
             if (hayMovimiento)
-               return CallFloatMethod(tipoMovimiento);
+                return CallFloatMethod(tipoMovimiento);
             return 0;
         }
         private float CallFloatMethod(string methodName)
@@ -437,11 +458,14 @@ namespace TGC.Group.Model
             if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
             {
                 var lastCajaPos = mesh.Position;
-                if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
-                    mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
-                else
+                //if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
+                //    mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
+                //else
+                if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
+                { //DEJO SOLO ESTA PARTE PARA EVITAR QUE LAS CAJAS SE MUEVAN EN EL EJE X, SOLO QUIERO EN EL Z
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
-                DetectarColisionesMovibles(lastCajaPos, mesh);
+                    DetectarColisionesMovibles(lastCajaPos, mesh);
+                }
             }
         }
         private void AgarrarLibros(TgcMesh mesh)
@@ -491,15 +515,15 @@ namespace TGC.Group.Model
 
             rs.Scale(0.2f);
             if (!enElPiso())
-              rs.Y = -jump;
-            personajePrincipal.Position = lastPos;
+                rs.Y = -jump;
+            personajePrincipal.Position = lastPos - rs;
         }
 
         /*private void cargarCancion(string direccionDeArchivo)
         {
             if (archivoActual == null || archivoActual != direccionDeArchivo)
             {
-                archivoActual = direccionDeArchivo;                                     Esto es para cargar a otra cancion en el transcurso del juego, lo dejo aca por si interesa en un futuro.
+                archivoActual = direccionDeArchivo;            Esto es para cargar a otra cancion en el transcurso del juego, lo dejo aca por si interesa en un futuro.
 
                 //Cargar archivo de la cancion
                 reproductorMp3.closeFile();
