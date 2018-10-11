@@ -38,7 +38,7 @@ namespace TGC.Group.Model
         private List<TgcMesh> meshesDeLaEscena;
 
         private float jumping;
-        private bool moving = false;
+        private bool moving = false, enElPiso = true;
         private bool rotating = false;
         private List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private List<TgcMesh> objectsInFront = new List<TgcMesh>();
@@ -47,7 +47,7 @@ namespace TGC.Group.Model
         private bool techo = false;
         private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
-        private TgcMesh floorCollider;
+        private TgcMesh floorCollider, ceilingCollider;
         private TGCVector3 lastColliderPos;
 
         private TgcMesh plataforma1;
@@ -87,7 +87,6 @@ namespace TGC.Group.Model
             meshesDeLaEscena = new List<TgcMesh>();
             foreach (TgcMesh mesh in scene.Meshes)
             {
-                mesh.AutoTransform = true;
                 meshesDeLaEscena.Add(mesh);
             }
 
@@ -204,7 +203,7 @@ namespace TGC.Group.Model
             var Movimiento = TGCVector3.Empty;
             //Si hubo desplazamiento
             float scale = 1;
-            if (!enElPiso())
+            if (!enElPiso)
                 scale = 0.4f;
             if (moving)
             {
@@ -291,6 +290,10 @@ namespace TGC.Group.Model
 
             reproductorMp3.closeFile();
         }
+        private bool DistanciaAlPisoSalto()
+        {
+            return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
+        }
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
             var collisionFound = false;
@@ -341,15 +344,19 @@ namespace TGC.Group.Model
                 {
                     if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
                     {
+                        enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 3;
-                        techo = false;
                         floorCollider = mesh;
                     }
-                    else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje)
+                    else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje && jump != 0)
+                    {
+                        ceilingCollider = mesh;
                         techo = true;
+                    }
 
                     if (floorCollider != null && sceneMeshBoundingBox == floorCollider.BoundingBox)
                         lastCollide = true;
+
 
                     collider = mesh;
 
@@ -364,27 +371,26 @@ namespace TGC.Group.Model
 
                     AgarrarLibros(mesh);
                 }
-                if (lastCollide == false)
-                    floorCollider = null;
+                if (lastCollide == false) {
+                    enElPiso = false;
+                    //floorCollider = null;
+                }
+
             }
 
         }
         private void Salto()
         {
-            if (Input.keyUp(Key.Space) && enElPiso())
+            if (Input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
                 jumping = 2.5f;
                 moving = true;
-
+                enElPiso = false;
             }
-        }
-        private bool enElPiso()
-        {
-            return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
         }
         private void AplicarGravedad()
         {
-            if (!enElPiso())
+            if (!enElPiso)
             {
                 velocidadCaminar = 1;
                 jumping -= 2.5f * ElapsedTime;
@@ -458,11 +464,14 @@ namespace TGC.Group.Model
             if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
             {
                 var lastCajaPos = mesh.Position;
-                //if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
-                //    mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
-                //else
+               if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
+                {
+                    mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
+                    DetectarColisionesMovibles(lastCajaPos, mesh);
+                }
+                else
                 if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
-                { //DEJO SOLO ESTA PARTE PARA EVITAR QUE LAS CAJAS SE MUEVAN EN EL EJE X, SOLO QUIERO EN EL Z
+                { 
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
@@ -514,8 +523,13 @@ namespace TGC.Group.Model
             }
 
             rs.Scale(0.2f);
-            if (!enElPiso())
+            if (!enElPiso && !techo)
                 rs.Y = -jump;
+            else if (techo)
+            {
+                rs.Y = Math.Abs(personajePrincipal.BoundingBox.PMax.Y - ceilingCollider.BoundingBox.PMax.Y);
+                techo = false;
+            }
             personajePrincipal.Position = lastPos - rs;
         }
 
