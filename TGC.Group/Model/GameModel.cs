@@ -43,7 +43,7 @@ namespace TGC.Group.Model
             var menu = new Menu();
             AdministradorDeEscenarios.getSingleton().setMediaDir(MediaDir);
             AdministradorDeEscenarios.getSingleton().setShaderDir(ShadersDir);
-            AdministradorDeEscenarios.getSingleton().agregarEscenario(menu);
+            AdministradorDeEscenarios.getSingleton().agregarEscenario(menu,Camara);
         }
 
 
@@ -70,35 +70,6 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             AdministradorDeEscenarios.getSingleton().dispose();
-        }
-
-
-        private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
-        {
-            var collisionFound = false;
-
-            foreach (var mesh in scene.Meshes)
-            {
-
-                //Los dos BoundingBox que vamos a testear
-                var mainMeshBoundingBox = meshAProbar.BoundingBox;
-                var sceneMeshBoundingBox = mesh.BoundingBox;
-
-                if (mainMeshBoundingBox == sceneMeshBoundingBox)
-                    continue;
-
-                //Ejecutar algoritmo de detección de colisiones
-                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
-
-                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && mainMeshBoundingBox != personajePrincipal.BoundingBox)
-                {
-                    collisionFound = true;
-                }
-            }
-            if (collisionFound)
-            {
-                meshAProbar.Position = lastPos;
-            }
         }
 
     }

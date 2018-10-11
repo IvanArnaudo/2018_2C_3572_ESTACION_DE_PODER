@@ -16,8 +16,8 @@ namespace TGC.Group.Model.Escenarios
         private string mediaDir;
         private string shaderDir;
 
-        private int escenarioActual;
-        private int escenarioSiguiente;
+        private int escenarioActual=0;
+        private int escenarioSiguiente=0;
        
         private AdministradorDeEscenarios(){
             escenarios = new List<Escenario>();
@@ -32,8 +32,13 @@ namespace TGC.Group.Model.Escenarios
         }
 
 
-        public void agregarEscenario(Escenario escenario){
-            // escena.init(mediaDir, shaderDir); HAY QUE PONER EL MEDIADIR Y EL SHADERDIR COMO VARIABLES GLOBALES
+        public void agregarEscenario(Escenario escenario, TgcCamera camara)
+        {
+            //if (modo) {
+                escenario.init(mediaDir, shaderDir, camara);
+            //} else {
+            //    escenario.initDual(mediaDir, shaderDir);
+            //}
             escenarios.Add(escenario);
             escenarioSiguiente = escenarios.IndexOf(escenario);
             //proxima = scene;
@@ -43,7 +48,7 @@ namespace TGC.Group.Model.Escenarios
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
             if (escenarios[escenarioSiguiente] != null){
                 escenarioActual = escenarioSiguiente;
-                escenarioSiguiente = -1;
+                escenarioSiguiente = escenarios.Count()-1;
             }
 
             if (escenarioActual == -1) return;

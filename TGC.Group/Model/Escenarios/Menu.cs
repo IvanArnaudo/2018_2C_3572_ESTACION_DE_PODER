@@ -13,27 +13,28 @@ namespace TGC.Group.Model.Escenarios
 {
     class Menu : Escenario
     {
-        //private Action cargarNivel1 = () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameModel());
-        //private Boton inicio;
+        //private Action cargarNivel1 = () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(),camara);
+        private Boton inicio;
         private Sprite sprite;
         private TgcTexture trustMe;
         private Viewport vp = D3DDevice.Instance.Device.Viewport;
 
-        public void init(string mediaDir, string shaderDir)
+        
+
+        public void init(string mediaDir, string shaderDir, TgcCamera camara)
         {
-            //inicio = new Boton("Inicio", 0f, 0.8f, cargarNivel1);
+            inicio = new Boton("Inicio", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(), camara));
             sprite = new Sprite(D3DDevice.Instance.Device);
             trustMe = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "imgMenu.png");
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara)
         {
-          //  inicio.Update(deltaTime, input);
+            inicio.Update(deltaTime, input);
         }
 
 
-        public void render(float deltaTime)
-        {
+        public void render(float deltaTime){
             sprite.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
             var scaling = new TGCVector3((float)vp.Width / trustMe.Width, (float)vp.Height / trustMe.Height, 0);
@@ -46,19 +47,18 @@ namespace TGC.Group.Model.Escenarios
 
             sprite.End();
 
-         //   inicio.Render();
+            inicio.Render();
         }
 
 
 
         public void dispose()
         {
-         //   inicio.Dispose();
+            inicio.Dispose();
         }
 
 
-
-    }
+        }
 
 
 }

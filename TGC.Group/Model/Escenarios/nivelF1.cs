@@ -1,7 +1,7 @@
 ﻿using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
-using TGC.Core.Example;
+//using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Examples.Camara;
@@ -11,6 +11,8 @@ using TGC.Core.Collision;
 using System.Reflection;
 using System;
 using TGC.Core.Sound;
+using TGC.Core.Input;
+using TGC.Core.Camara;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -18,8 +20,8 @@ namespace TGC.Group.Model.Escenarios
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
-        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+      //  /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
+      //  /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
@@ -53,34 +55,19 @@ namespace TGC.Group.Model.Escenarios
 
         private int cantidadDeLibros = 0;
 
-        //public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
-        //{
-        //    Category = Game.Default.Category;
-        //    Name = Game.Default.Name;
-        //    Description = Game.Default.Description;
-        //}
-
         private TgcScene scene;
+        
 
-        public void Init(string MediaDir, string shaderDir)
+        public void init(string MediaDir, string shaderDir, TgcCamera camara)
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-
-            //Acá empieza mi intento de insertar una escena
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
 
-            pathDeLaCancion = MediaDir + "Musica\\ElEstudiante.mp3";
+            pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
 
             meshesDeLaEscena = new List<TgcMesh>();
-            foreach (TgcMesh mesh in scene.Meshes)
-            {
-                mesh.AutoTransform = true;
-                meshesDeLaEscena.Add(mesh);
-            }
-
-            //Console.WriteLine("el nombre del mesh buscado es: " + scene.Meshes[200].Name);
 
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
@@ -99,12 +86,14 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.Position = new TGCVector3(400, 1, 400);
             personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
-            //Probamos con escala? No sirve
-            //personajePrincipal.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
+
+         // camaraInterna = new TgcFpsCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
-            Camara = camaraInterna;
+            camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
+
+            Console.WriteLine(scene.Meshes[100].Name);
 
             plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
             plataforma2 = scene.Meshes[165];
@@ -112,46 +101,37 @@ namespace TGC.Group.Model.Escenarios
             plataformasMovibles.Add(plataforma2);
 
             reproductorMp3.FileName = pathDeLaCancion;
+            reproductorMp3.play(true);
+
         }
-        public override void Update()
-        {
-            PreUpdate();
+       
+
+        public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
+
+            //camara = camaraInterna;
+            
             velocidadCaminar = 5;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
-            //Animacion de las plataformas
-            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * ElapsedTime, 0);
+           // Animacion de las plataformas
+            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
             if (FastMath.Abs(plataforma1.Position.Y) > 360f)
             {
                 direccionDeMovimientoActual *= -1;
             }
 
-            plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * ElapsedTime, 0);
+            plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
             if (FastMath.Abs(plataforma2.Position.Y) > 360f)
             {
                 direccionDeMovimientoActual *= -1;
             }
 
-            /*foreach (TgcMesh libro in scene.Meshes) {
-                var posicionInicialDelLibro = libro.Position.Y;
-                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
-                {
-                    libro.Move(0, velocidadDesplazamientolibros * direccionDeMovimientoActual * ElapsedTime, 0);         POR AHORA NO LO HAGO, HAY QUE REMODELAR LOS LIBROS DE FISICA 1 PARA QUE TOME CORRECTAMENTE LA ROTACION.
-                    if (FastMath.Abs(libro.Position.Y) > 100f || posicionInicialDelLibro == 0)
-                    {
-                        direccionDeMovimientoActual *= -1;
-                    }
-                    //libro.RotateY(velocidadRotacionlibros * ElapsedTime);
-                }
-            }*/
-            //Fin de animacion de las plataformas
-
             var moveForward = 0f;
             float rotate = 0;
             moving = false;
 
-            moveForward = MovimientoAbajo() - MovimientoArriba();
-            rotate = RotacionDerecha() - RotacionIzquierda();
+            moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
+            rotate = RotacionDerecha(input) - RotacionIzquierda(input);
 
             if (floorCollider != null && plataformasMovibles.Contains(floorCollider) && floorCollider.BoundingBox.PMax.Y < personajePrincipal.BoundingBox.PMin.Y)
             {
@@ -159,15 +139,15 @@ namespace TGC.Group.Model.Escenarios
                 res.Subtract(lastColliderPos);
                 personajePrincipal.Position = personajePrincipal.Position + res;
             }
-            Salto();
-            AplicarGravedad();
+            Salto(input);
+            AplicarGravedad(deltaTime);
 
 
             //Si hubo rotacion
             if (rotating)
             {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                var rotAngle = Geometry.DegreeToRadian(rotate * ElapsedTime);
+                var rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
                 camaraInterna.rotateY(rotAngle);
 
@@ -219,36 +199,30 @@ namespace TGC.Group.Model.Escenarios
                 }
             }
 
-            PostUpdate();
         }
 
-        public override void Render()
-        {
 
-            PreRender();
 
-            //scene.RenderAll();
-            /*foreach (TgcMesh mesh in scene.Meshes)
-            {
-                mesh.BoundingBox.Render();
-            }*/
 
-            reproducirMusica();
+        public void render(float deltaTime){
+
+           // reproducirMusica();
 
             foreach (var mesh in objectsInFront)
             {
                 if (!librosAgarrados.Contains(mesh))
                 {
                     mesh.Render();
-                }                                                   //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+                } 
+           //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
-            personajePrincipal.animateAndRender(ElapsedTime);
-
-            PostRender();
+            personajePrincipal.animateAndRender(deltaTime);
 
         }
-        public override void Dispose()
+
+
+        public void dispose()
         {
 
             foreach (TgcMesh mesh in scene.Meshes)
@@ -263,6 +237,8 @@ namespace TGC.Group.Model.Escenarios
 
             reproductorMp3.closeFile();
         }
+
+
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
             var collisionFound = false;
@@ -341,9 +317,9 @@ namespace TGC.Group.Model.Escenarios
             }
 
         }
-        private void Salto()
+        private void Salto(TgcD3dInput input)
         {
-            if (Input.keyUp(Key.Space) && enElPiso())
+            if (input.keyUp(Key.Space) && enElPiso())
             {
                 jumping = 2.5f;
                 moving = true;
@@ -354,36 +330,35 @@ namespace TGC.Group.Model.Escenarios
         {
             return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
         }
-        private void AplicarGravedad()
+        private void AplicarGravedad(float dTime)
         {
             if (!enElPiso())
             {
                 velocidadCaminar = 1;
-                jumping -= 2.5f * ElapsedTime;
+                jumping -= 2.5f * dTime;
                 jump = jumping;
                 moving = true;
             }
             else
                 jump = 0;
         }
-        private float RotacionIzquierda()
+        private float RotacionIzquierda(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Left) || Input.keyDown(Key.A), "Rotacion");
         }
-        private float RotacionDerecha()
+        private float RotacionDerecha(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Right) || Input.keyDown(Key.D), "Rotacion");
         }
-        private float MovimientoAbajo()
+        private float MovimientoAbajo(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Down) || Input.keyDown(Key.S), "Caminar");
         }
-        private float MovimientoArriba()
+        private float MovimientoArriba(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Up) || Input.keyDown(Key.W), "Caminar");
         }
-        private void reproducirMusica()
-        {
+        private void reproducirMusica(TgcD3dInput Input){
             var estadoActual = reproductorMp3.getStatus();
             if (Input.keyPressed(Key.M))
             {
@@ -488,6 +463,11 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.Position = lastPos - rs;
         }
 
+
+        public void initDual(string MediaDir, string shaderDir)
+        {
+            Console.WriteLine("MediaDir1: " + MediaDir);
+        }
         /*private void cargarCancion(string direccionDeArchivo)
         {
             if (archivoActual == null || archivoActual != direccionDeArchivo)
