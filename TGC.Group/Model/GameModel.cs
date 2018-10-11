@@ -73,6 +73,11 @@ namespace TGC.Group.Model
         // private TgcMesh mesh;
         private TgcScene scene;
 
+
+        /// /////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////INIT///////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
+
         public override void Init()
         {
             //Device de DirectX para crear primitivas.
@@ -120,6 +125,10 @@ namespace TGC.Group.Model
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
         }
+
+        /// /////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////UPDATE///////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
         public override void Update()
         {
             PreUpdate();
@@ -152,7 +161,7 @@ namespace TGC.Group.Model
                     incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * ElapsedTime;
                     libro.Move(0, incremento, 0);
                     distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 1800f)
+                    if (Math.Abs(distanciaRecorrida) > 1250f)
                     {
                         direccionDeMovimientoActual *= -1;
                     }
@@ -249,6 +258,9 @@ namespace TGC.Group.Model
             PostUpdate();
         }
 
+        /////////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////RENDER///////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
         public override void Render()
         {
 
@@ -266,8 +278,12 @@ namespace TGC.Group.Model
             {
                 if (!librosAgarrados.Contains(mesh))
                 {
-                    mesh.Render();
-                }                                                   //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+                    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
+                    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    {
+                        mesh.Render();
+                    }                                                   //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
+                }
             }
 
             personajePrincipal.animateAndRender(ElapsedTime);
@@ -275,6 +291,12 @@ namespace TGC.Group.Model
             PostRender();
 
         }
+
+
+        /////////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////DISPOSE//////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
+
         public override void Dispose()
         {
 
@@ -290,6 +312,8 @@ namespace TGC.Group.Model
 
             reproductorMp3.closeFile();
         }
+
+
         private bool DistanciaAlPisoSalto()
         {
             return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
