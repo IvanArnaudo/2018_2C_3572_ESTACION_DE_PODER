@@ -109,7 +109,7 @@ namespace TGC.Group.Model.Escenarios
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
 
             //camara = camaraInterna;
-            
+            AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
             velocidadCaminar = 5;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;

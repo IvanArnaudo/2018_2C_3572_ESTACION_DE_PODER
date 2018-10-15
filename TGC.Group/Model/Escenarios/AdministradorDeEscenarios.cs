@@ -15,6 +15,7 @@ namespace TGC.Group.Model.Escenarios
         private static AdministradorDeEscenarios singleton;
         private string mediaDir;
         private string shaderDir;
+        private TgcCamera camaraEsc;
 
         private int escenarioActual=0;
         private int escenarioSiguiente=0;
@@ -44,6 +45,14 @@ namespace TGC.Group.Model.Escenarios
             //proxima = scene;
         }
 
+        public TgcCamera GetCamaraEscenario()
+        {
+            return camaraEsc;
+        }
+        public void SetCamara(TgcCamera camara)
+        {
+            camaraEsc = camara;
+        }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
             if (escenarios[escenarioSiguiente] != null){

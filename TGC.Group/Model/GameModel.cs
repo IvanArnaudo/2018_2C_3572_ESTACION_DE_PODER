@@ -52,7 +52,11 @@ namespace TGC.Group.Model
             PreUpdate();
 
             if (ElapsedTime < 0.02)
+            {
                 AdministradorDeEscenarios.getSingleton().update(ElapsedTime, Input, Camara);
+                if (AdministradorDeEscenarios.getSingleton().GetCamaraEscenario() != null)
+                    Camara = AdministradorDeEscenarios.getSingleton().GetCamaraEscenario();
+            }
 
             PostUpdate();
         }
