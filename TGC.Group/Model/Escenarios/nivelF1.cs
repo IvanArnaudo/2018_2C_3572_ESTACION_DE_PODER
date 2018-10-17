@@ -12,6 +12,8 @@ using System;
 using TGC.Core.Sound;
 using TGC.Core.Input;
 using TGC.Core.Camara;
+using TGC.Core.BoundingVolumes;
+using System.Drawing;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -53,10 +55,11 @@ namespace TGC.Group.Model.Escenarios
         private int cantidadDeLibros = 0;
 
         private TgcScene scene;
-
+        private TGCVector3 principio = new TGCVector3(409, 151, 337);
         private float incremento = 0f;
         private float distanciaRecorrida = 0f;
-
+        private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(
+             new TGCVector3(71, 571, 2591), new TGCVector3(835, 386, 2561));
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -352,9 +355,10 @@ namespace TGC.Group.Model.Escenarios
                     //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
 
                     Slider(lastPos, movementRay);
-
+               //     EstablecerCheckpoint();
                     MoverObjetos(mesh, movementRay);
-
+                    CaerseAlAgua(mesh,movementRay);
+                    personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
                 if (lastCollide == false)
@@ -449,6 +453,8 @@ namespace TGC.Group.Model.Escenarios
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
 
+
+
         private void MoverObjetos(TgcMesh mesh, TGCVector3 movementRay)
         {
             if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
@@ -456,16 +462,27 @@ namespace TGC.Group.Model.Escenarios
                 var lastCajaPos = mesh.Position;
                 if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
                 {
+                    personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
                 else
                  if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
                 {
+                    personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
             }
+        }
+
+        private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
+        {
+            if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor"))
+            {
+                personajePrincipal.Position = principio;
+                }
+            
         }
 
         private void AgarrarLibros(TgcMesh mesh)
@@ -538,6 +555,8 @@ namespace TGC.Group.Model.Escenarios
                 reproductorMp3.FileName = archivoActual;
             }
         }*/
+        
+
 
 
     }
