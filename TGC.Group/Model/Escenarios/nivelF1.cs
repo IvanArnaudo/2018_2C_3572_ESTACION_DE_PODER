@@ -1,7 +1,6 @@
 ﻿using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
-//using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Examples.Camara;
@@ -17,11 +16,7 @@ using TGC.Core.Camara;
 namespace TGC.Group.Model.Escenarios
 {
     class nivelF1:Escenario{
-        /// <summary>
-        ///     Constructor del juego.
-        /// </summary>
-      //  /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-      //  /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
@@ -33,7 +28,7 @@ namespace TGC.Group.Model.Escenarios
         private List<TgcMesh> meshesDeLaEscena;
 
         private float jumping;
-        private bool moving = false;
+        private bool moving = false, enElPiso = true;
         private bool rotating = false;
         private List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private List<TgcMesh> objectsInFront = new List<TgcMesh>();
@@ -42,13 +37,15 @@ namespace TGC.Group.Model.Escenarios
         private bool techo = false;
         private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
-        private TgcMesh floorCollider;
+        private TgcMesh floorCollider, ceilingCollider;
+
         private TGCVector3 lastColliderPos;
 
         private TgcMesh plataforma1;
         private TgcMesh plataforma2;
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
+
         private string pathDeLaCancion;
 
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
@@ -56,7 +53,14 @@ namespace TGC.Group.Model.Escenarios
         private int cantidadDeLibros = 0;
 
         private TgcScene scene;
-        
+
+        private float incremento = 0f;
+        private float distanciaRecorrida = 0f;
+
+        /// /////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////INIT/////////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
+
 
         public void init(string MediaDir, string shaderDir, TgcCamera camara)
         {
@@ -84,15 +88,13 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.playAnimation("Parado", true);
             personajePrincipal.AutoTransform = true;
             personajePrincipal.Position = new TGCVector3(400, 1, 400);
-            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+           // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
          // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
-
-            Console.WriteLine(scene.Meshes[100].Name);
 
             plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
             plataforma2 = scene.Meshes[165];
@@ -101,18 +103,25 @@ namespace TGC.Group.Model.Escenarios
 
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
+            AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
-       
+
+        /// /////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////UPDATE///////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
+
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
 
-            //camara = camaraInterna;
-            AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
+            //AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
+
             velocidadCaminar = 5;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
-           // Animacion de las plataformas
+
+            // Animacion de las plataformas
+
             plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
             if (FastMath.Abs(plataforma1.Position.Y) > 360f)
             {
@@ -124,6 +133,23 @@ namespace TGC.Group.Model.Escenarios
             {
                 direccionDeMovimientoActual *= -1;
             }
+
+            //Animacion de los libros de F1
+
+            foreach (TgcMesh libro in scene.Meshes)
+            {
+                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
+                {
+                    incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * deltaTime;
+                    libro.Move(0, incremento, 0);
+                    distanciaRecorrida = distanciaRecorrida + incremento;
+                    if (Math.Abs(distanciaRecorrida) > 1250f)
+                    {
+                        direccionDeMovimientoActual *= -1;
+                    }
+                }
+            }
+
 
             var moveForward = 0f;
             float rotate = 0;
@@ -155,7 +181,7 @@ namespace TGC.Group.Model.Escenarios
             var Movimiento = TGCVector3.Empty;
             //Si hubo desplazamiento
             float scale = 1;
-            if (!enElPiso())
+            if (!enElPiso)
                 scale = 0.4f;
             if (moving)
             {
@@ -201,7 +227,9 @@ namespace TGC.Group.Model.Escenarios
         }
 
 
-
+        /////////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////RENDER///////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
 
         public void render(float deltaTime){
 
@@ -211,7 +239,9 @@ namespace TGC.Group.Model.Escenarios
             {
                 if (!librosAgarrados.Contains(mesh))
                 {
-                    mesh.Render();
+                //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
+                //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                        mesh.Render();
                 } 
            //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
@@ -220,6 +250,10 @@ namespace TGC.Group.Model.Escenarios
 
         }
 
+
+        /////////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////DISPOSE//////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
 
         public void dispose()
         {
@@ -237,6 +271,14 @@ namespace TGC.Group.Model.Escenarios
             reproductorMp3.closeFile();
         }
 
+        /////////////////////////////////////////////////////////////////////////
+        /// ////////////////////////////MISC/////////////////////////////////////
+        /// /////////////////////////////////////////////////////////////////////
+
+        private bool DistanciaAlPisoSalto()
+        {
+            return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
+        }
 
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
@@ -288,15 +330,19 @@ namespace TGC.Group.Model.Escenarios
                 {
                     if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
                     {
+                        enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 3;
-                        techo = false;
                         floorCollider = mesh;
                     }
-                    else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje)
+                    else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje && jump != 0)
+                    {
+                        ceilingCollider = mesh;
                         techo = true;
+                    }
 
                     if (floorCollider != null && sceneMeshBoundingBox == floorCollider.BoundingBox)
                         lastCollide = true;
+
 
                     collider = mesh;
 
@@ -312,26 +358,29 @@ namespace TGC.Group.Model.Escenarios
                     AgarrarLibros(mesh);
                 }
                 if (lastCollide == false)
-                    floorCollider = null;
+                {
+                    enElPiso = false;
+                    //floorCollider = null;
+                }
+
             }
 
         }
+
+
         private void Salto(TgcD3dInput input)
         {
-            if (input.keyUp(Key.Space) && enElPiso())
+            if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
                 jumping = 2.5f;
                 moving = true;
-
+                enElPiso = false;
             }
         }
-        private bool enElPiso()
-        {
-            return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
-        }
+
         private void AplicarGravedad(float dTime)
         {
-            if (!enElPiso())
+            if (!enElPiso)
             {
                 velocidadCaminar = 1;
                 jumping -= 2.5f * dTime;
@@ -399,18 +448,26 @@ namespace TGC.Group.Model.Escenarios
         {
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
+
         private void MoverObjetos(TgcMesh mesh, TGCVector3 movementRay)
         {
             if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
             {
                 var lastCajaPos = mesh.Position;
                 if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
+                {
                     mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
+                    DetectarColisionesMovibles(lastCajaPos, mesh);
+                }
                 else
+                 if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
+                {
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
-                DetectarColisionesMovibles(lastCajaPos, mesh);
+                    DetectarColisionesMovibles(lastCajaPos, mesh);
+                }
             }
         }
+
         private void AgarrarLibros(TgcMesh mesh)
         {
             if (mesh.Name == "Box_1" && !librosAgarrados.Contains(mesh))
@@ -421,6 +478,8 @@ namespace TGC.Group.Model.Escenarios
                 mesh.Dispose();
             }
         }
+
+
         private void Slider(TGCVector3 lastPos, TGCVector3 movementRay)
         {
 
@@ -457,16 +516,17 @@ namespace TGC.Group.Model.Escenarios
             }
 
             rs.Scale(0.2f);
-            if (!enElPiso())
+            if (!enElPiso && !techo)
                 rs.Y = -jump;
+            else if (techo)
+            {
+                rs.Y = Math.Abs(personajePrincipal.BoundingBox.PMax.Y - ceilingCollider.BoundingBox.PMax.Y);
+                techo = false;
+            }
             personajePrincipal.Position = lastPos - rs;
         }
 
 
-        public void initDual(string MediaDir, string shaderDir)
-        {
-            Console.WriteLine("MediaDir1: " + MediaDir);
-        }
         /*private void cargarCancion(string direccionDeArchivo)
         {
             if (archivoActual == null || archivoActual != direccionDeArchivo)
