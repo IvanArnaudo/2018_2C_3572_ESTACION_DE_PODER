@@ -35,22 +35,16 @@ namespace TGC.Group.Model.Escenarios
 
         public void agregarEscenario(Escenario escenario, TgcCamera camara)
         {
-            //if (modo) {
-                escenario.init(mediaDir, shaderDir, camara);
-            //} else {
-            //    escenario.initDual(mediaDir, shaderDir);
-            //}
+            escenario.init(mediaDir, shaderDir, camara);
             escenarios.Add(escenario);
             escenarioSiguiente = escenarios.IndexOf(escenario);
             //proxima = scene;
         }
 
-        public TgcCamera GetCamaraEscenario()
-        {
+        public TgcCamera GetCamaraEscenario(){
             return camaraEsc;
         }
-        public void SetCamara(TgcCamera camara)
-        {
+        public void SetCamara(TgcCamera camara){
             camaraEsc = camara;
         }
 
@@ -76,10 +70,6 @@ namespace TGC.Group.Model.Escenarios
             foreach(Escenario esc in escenarios){
                 esc.dispose();
             }
-            //while (scenes.Count > 0)
-            //{
-            //    scenes.Pop().dispose();
-            //}
         }
 
         public void escenarioAnterior(){
@@ -96,8 +86,6 @@ namespace TGC.Group.Model.Escenarios
         {
             this.shaderDir = shaderDir;
         }
-
-
 
     }
 }

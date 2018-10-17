@@ -88,9 +88,8 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
-         // camaraInterna = new TgcFpsCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
-            camara = camaraInterna;
+         // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
             Console.WriteLine(scene.Meshes[100].Name);
