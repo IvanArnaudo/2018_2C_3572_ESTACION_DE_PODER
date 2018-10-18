@@ -3,7 +3,6 @@ using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Examples.Camara;
 using TGC.Core.SkeletalAnimation;
 using System.Collections.Generic;
 using TGC.Core.Collision;
@@ -40,6 +39,7 @@ namespace TGC.Group.Model.Escenarios
         private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
         private TgcMesh floorCollider, ceilingCollider;
+        private TGCMatrix escalaBase;
 
         private TGCVector3 lastColliderPos;
 
@@ -56,10 +56,11 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcScene scene;
         private TGCVector3 principio = new TGCVector3(409, 151, 337);
-        private float incremento = 0f;
+
+        private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
         private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(
-             new TGCVector3(71, 571, 2591), new TGCVector3(835, 386, 2561));
+        new TGCVector3(71, 571, 2591), new TGCVector3(835, 386, 2561));
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -89,13 +90,13 @@ namespace TGC.Group.Model.Escenarios
                     });
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
-            personajePrincipal.AutoTransform = true;
+            
             personajePrincipal.Position = new TGCVector3(400, 1, 400);
            // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
-            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.BoundingBox.calculateBoxCenter(), 250, 500);
+            camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
          // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
@@ -105,7 +106,7 @@ namespace TGC.Group.Model.Escenarios
             plataformasMovibles.Add(plataforma2);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+            //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -161,6 +162,8 @@ namespace TGC.Group.Model.Escenarios
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
 
+           
+
             if (floorCollider != null && plataformasMovibles.Contains(floorCollider) && floorCollider.BoundingBox.PMax.Y < personajePrincipal.BoundingBox.PMin.Y)
             {
                 TGCVector3 res = floorCollider.Position;
@@ -175,7 +178,7 @@ namespace TGC.Group.Model.Escenarios
             if (rotating)
             {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                var rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
+                rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
                 camaraInterna.rotateY(rotAngle);
 
@@ -226,7 +229,10 @@ namespace TGC.Group.Model.Escenarios
                     objectsInFront.Add(mesh);
                 }
             }
-
+            var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
+            var T = TGCMatrix.Translation(personajePrincipal.Position);
+            escalaBase = Rot * T;
+            personajePrincipal.Transform = escalaBase;
         }
 
 
@@ -560,5 +566,6 @@ namespace TGC.Group.Model.Escenarios
 
 
     }
+
 }
 

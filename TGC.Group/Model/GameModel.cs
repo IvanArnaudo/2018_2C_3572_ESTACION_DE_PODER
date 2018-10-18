@@ -4,7 +4,6 @@ using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Examples.Camara;
 using TGC.Core.SkeletalAnimation;
 using System.Collections.Generic;
 using TGC.Core.Collision;
