@@ -55,12 +55,14 @@ namespace TGC.Group.Model.Escenarios
         private int cantidadDeLibros = 0;
 
         private TgcScene scene;
-        private TGCVector3 principio = new TGCVector3(409, 151, 337);
+
+        private TGCVector3 puntoCheckpointActual = new TGCVector3(409, 151, 337);
+        private TGCVector3 puntoCheckpoint1 = new TGCVector3(450, 400, 2570);
 
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
-        private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(
-        new TGCVector3(71, 571, 2591), new TGCVector3(835, 386, 2561));
+
+        private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(835, 386, 2561), new TGCVector3(71, 571, 2591));
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -108,7 +110,7 @@ namespace TGC.Group.Model.Escenarios
             reproductorMp3.FileName = pathDeLaCancion;
             //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
-
+           
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -204,7 +206,9 @@ namespace TGC.Group.Model.Escenarios
                 Movimiento.Scale(scale);
                 Movimiento.Y = jump;
                 personajePrincipal.Move(Movimiento);
+                
                 DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje);
+                
 
             }
             else
@@ -317,9 +321,23 @@ namespace TGC.Group.Model.Escenarios
             }
         }
 
+        private void detectarSiHayColisionDeCheckpoints(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
+        {
+            var mainMeshBoundingBox = personajePrincipal.BoundingBox;
+            //El checkpoint 1 fue atravesado
+            if (TgcCollisionUtils.testAABBAABB(mainMeshBoundingBox, checkpoint1)){
+                puntoCheckpointActual = puntoCheckpoint1;
+            }
+
+        }
+
+
+
         private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
         {
             var lastCollide = false;
+            detectarSiHayColisionDeCheckpoints(lastPos, pminYAnteriorPersonaje, pmaxYAnteriorPersonaje);
+
             foreach (var mesh in scene.Meshes)
             {
 
@@ -486,7 +504,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor"))
             {
-                personajePrincipal.Position = principio;
+                personajePrincipal.Position = puntoCheckpointActual;
                 }
             
         }
@@ -549,6 +567,7 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.Position = lastPos - rs;
         }
 
+       
 
         /*private void cargarCancion(string direccionDeArchivo)
         {
