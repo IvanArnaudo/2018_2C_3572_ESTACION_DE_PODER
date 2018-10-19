@@ -36,7 +36,7 @@ namespace TGC.Group.Model.Escenarios
         private List<TgcMesh> librosAgarrados = new List<TgcMesh>();
         float jump = 0;
         private bool techo = false;
-        private TGCMatrix movimientoPlataforma;
+   //     private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
         private TgcMesh floorCollider, ceilingCollider;
         private TGCMatrix escalaBase;
@@ -57,12 +57,14 @@ namespace TGC.Group.Model.Escenarios
         private TgcScene scene;
 
         private TGCVector3 puntoCheckpointActual = new TGCVector3(409, 151, 337);
-        private TGCVector3 puntoCheckpoint1 = new TGCVector3(450, 400, 2570);
+        private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
+        private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -100, 7900);
 
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
 
-        private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(835, 386, 2561), new TGCVector3(71, 571, 2591));
+        private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(839, 591, 4969), new TGCVector3(23, 395, 5120));
+        private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -324,11 +326,16 @@ namespace TGC.Group.Model.Escenarios
         private void detectarSiHayColisionDeCheckpoints(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
         {
             var mainMeshBoundingBox = personajePrincipal.BoundingBox;
+            var colisionCheckp = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint1);
+            var colisionCheckp2 = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint2);
             //El checkpoint 1 fue atravesado
-            if (TgcCollisionUtils.testAABBAABB(mainMeshBoundingBox, checkpoint1)){
+            if (colisionCheckp != TgcCollisionUtils.BoxBoxResult.Afuera)
+            {
                 puntoCheckpointActual = puntoCheckpoint1;
+            } else if (colisionCheckp2 != TgcCollisionUtils.BoxBoxResult.Afuera)
+            {
+                puntoCheckpointActual = puntoCheckpoint2;
             }
-
         }
 
 
@@ -502,7 +509,7 @@ namespace TGC.Group.Model.Escenarios
 
         private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
         {
-            if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor"))
+            if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Roof") == false)
             {
                 personajePrincipal.Position = puntoCheckpointActual;
                 }
