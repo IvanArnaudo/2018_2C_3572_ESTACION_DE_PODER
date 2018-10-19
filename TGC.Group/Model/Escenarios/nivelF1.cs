@@ -20,7 +20,7 @@ namespace TGC.Group.Model.Escenarios
 {
     class nivelF1:Escenario{
 
-        private float velocidadCaminar = 5;
+        private float velocidadCaminar = 3;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
         private float velocidadDesplazamientolibros = 10f;
@@ -140,7 +140,7 @@ namespace TGC.Group.Model.Escenarios
 
             //AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
-            velocidadCaminar = 5;
+            velocidadCaminar = 2;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
 
@@ -212,7 +212,7 @@ namespace TGC.Group.Model.Escenarios
             //Si hubo desplazamiento
             float scale = 1;
             if (!enElPiso)
-                scale = 0.4f;
+                scale = 0.7f;
             if (moving)
             {
                 //Activar animacion de caminando
@@ -226,10 +226,10 @@ namespace TGC.Group.Model.Escenarios
                 //velocidadCaminar = 5;
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, 0, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 Movimiento.Scale(scale);
-                Movimiento.Y = jump;
+                Movimiento.Y = jump * deltaTime;
                 personajePrincipal.Move(Movimiento);
                 
-                DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje);
+                DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje, deltaTime);
                 
 
             }
@@ -360,7 +360,7 @@ namespace TGC.Group.Model.Escenarios
 
 
 
-        private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje)
+        private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje, float dtime)
         {
             var lastCollide = false;
             detectarSiHayColisionDeCheckpoints(lastPos, pminYAnteriorPersonaje, pmaxYAnteriorPersonaje);
@@ -384,6 +384,8 @@ namespace TGC.Group.Model.Escenarios
                 {
                     if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
                     {
+                        jump = 0;
+                        jumping = 0;
                         enElPiso = true;
                         lastPos.Y = sceneMeshBoundingBox.PMax.Y + 3;
                         floorCollider = mesh;
@@ -405,18 +407,22 @@ namespace TGC.Group.Model.Escenarios
                     //Para todos los casos podemos deducir que la normal del plano cancela el movimiento en dicho plano.
                     //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
 
-                    Slider(lastPos, movementRay);
+                    Slider(lastPos, movementRay, dtime);
                //     EstablecerCheckpoint();
                     MoverObjetos(mesh, movementRay);
                     CaerseAlAgua(mesh,movementRay);
                     personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
-                if (lastCollide == false)
+                if (lastCollide == false && floorCollider != null)
                 {
-                    enElPiso = false;
-                    //floorCollider = null;
+                    personajePrincipal.Move(0, -3, 0);
+                    if (TgcCollisionUtils.classifyBoxBox(personajePrincipal.BoundingBox, floorCollider.BoundingBox) == TgcCollisionUtils.BoxBoxResult.Afuera)
+                        enElPiso = false;
+                    personajePrincipal.Move(0, 3, 0);
                 }
+                else if (floorCollider == null)
+                    enElPiso = false;
 
             }
 
@@ -427,7 +433,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
-                jumping = 2.5f;
+                jumping = 400.5f;
                 moving = true;
                 enElPiso = false;
             }
@@ -437,8 +443,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (!enElPiso)
             {
-                velocidadCaminar = 1;
-                jumping -= 2.5f * dTime;
+                jumping -= 2.5f;
                 jump = jumping;
                 moving = true;
             }
@@ -549,7 +554,7 @@ namespace TGC.Group.Model.Escenarios
         }
 
 
-        private void Slider(TGCVector3 lastPos, TGCVector3 movementRay)
+        private void Slider(TGCVector3 lastPos, TGCVector3 movementRay, float dtime)
         {
 
             var rs = TGCVector3.Empty;
@@ -586,7 +591,7 @@ namespace TGC.Group.Model.Escenarios
 
             rs.Scale(0.2f);
             if (!enElPiso && !techo)
-                rs.Y = -jump;
+                rs.Y = -jump * dtime;
             else if (techo)
             {
                 rs.Y = Math.Abs(personajePrincipal.BoundingBox.PMax.Y - ceilingCollider.BoundingBox.PMax.Y);

@@ -21,6 +21,8 @@ namespace TGC.Group.Model.Escenarios
         private TgcScene scene;
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
+        private float velocidadDesplazamientoColeccionables = 10f;
+        private float direccionDeMovimientoActual = 1;
 
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
@@ -31,31 +33,34 @@ namespace TGC.Group.Model.Escenarios
         private bool rotating = false;
         private bool techo = false;
 
-        private List<TgcMesh> objectsBehind = new List<TgcMesh>();
-        private List<TgcMesh> objectsInFront = new List<TgcMesh>();
-        private List<TgcMesh> coleccionables = new List<TgcMesh>();
-        private int cantidadDeLibros = 0;
-
-        //private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
         private TgcMesh floorCollider, ceilingCollider;
         private TGCMatrix escalaBase;
-
         private TGCVector3 lastColliderPos;
-
-        private TgcMp3Player reproductorMp3 = new TgcMp3Player();
-        private string pathDeLaCancion;
-
-        private TGCVector3 principio = new TGCVector3(409, 151, 337);
 
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
 
+        private List<TgcMesh> objectsBehind = new List<TgcMesh>();
+        private List<TgcMesh> objectsInFront = new List<TgcMesh>();
 
-        // puerta1 = Puerta64
-        // puerta2 = Puerta65
-        // puerta3 = Puerta86
-        // puerta4 = Puerta93
+
+        private List<TgcMesh> coleccionables = new List<TgcMesh>();
+        private List<TgcMesh> coleccionablesAgarrados = new List<TgcMesh>();
+        private int cantidadColeccionables = 0;
+
+        private TgcMp3Player reproductorMp3 = new TgcMp3Player();
+        private string pathDeLaCancion;
+
+        private TGCVector3 puerta1 = new TGCVector3(900, 1, 337);
+        private TGCVector3 puerta2 = new TGCVector3(1705, 1, 337);
+        private TGCVector3 puerta3 = new TGCVector3(3412, 1, 2103);
+        private float puertaCruzada = 0;
+
+        // puerta1 = Puerta63
+        // puerta2 = Puerta64
+        // puerta3 = Puerta85
+        // mumukis = Box_4332 - 4340
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -71,6 +76,10 @@ namespace TGC.Group.Model.Escenarios
             scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml");
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
 
+
+            Console.WriteLine(scene.Meshes[62].Name);
+            Console.WriteLine(scene.Meshes[63].Name);
+
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal = skeletalLoader.loadMeshAndAnimationsFromFile(
                                     MediaDir + "Robot\\Robot-TgcSkeletalMesh.xml",
@@ -81,16 +90,24 @@ namespace TGC.Group.Model.Escenarios
                                     });
 
             personajePrincipal.playAnimation("Parado", true);
-            personajePrincipal.Position = new TGCVector3(105, 1, 310);
+            personajePrincipal.Position = new TGCVector3(210, 1, 310);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
-
+            //coleccionables.Add(scene.Meshes[331]);
+            //coleccionables.Add(scene.Meshes[332]);
+            //coleccionables.Add(scene.Meshes[333]);
+            //coleccionables.Add(scene.Meshes[334]);
+            //coleccionables.Add(scene.Meshes[335]);
+            //coleccionables.Add(scene.Meshes[336]);
+            //coleccionables.Add(scene.Meshes[337]);
+            //coleccionables.Add(scene.Meshes[338]);
+            //coleccionables.Add(scene.Meshes[339]);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            //reproductorMp3.play(true);
+            reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -110,19 +127,19 @@ namespace TGC.Group.Model.Escenarios
             moving = false;
 
 
-            //foreach (TgcMesh libro in scene.Meshes)
-            //{
-            //    if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
-            //    {
-            //        incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * deltaTime;
-            //        libro.Move(0, incremento, 0);
-            //        distanciaRecorrida = distanciaRecorrida + incremento;
-            //        if (Math.Abs(distanciaRecorrida) > 1250f)
-            //        {
-            //            direccionDeMovimientoActual *= -1;
-            //        }
-            //    }
-            //}
+            foreach (TgcMesh coleccionable in coleccionables)
+            {
+                if (!coleccionablesAgarrados.Contains(coleccionable))
+                {
+                    incremento = velocidadDesplazamientoColeccionables * direccionDeMovimientoActual * deltaTime;
+                    coleccionable.Move(0, incremento, 0);
+                    distanciaRecorrida = distanciaRecorrida + incremento;
+                    if (Math.Abs(distanciaRecorrida) > 1250f)
+                    {
+                        direccionDeMovimientoActual *= -1;
+                    }
+                }
+            }
 
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
@@ -283,14 +300,14 @@ namespace TGC.Group.Model.Escenarios
                     collider = mesh;
 
                     var movementRay = lastPos - personajePrincipal.Position;
-                    //Luego debemos clasificar sobre que plano estamos chocando y la direccion de movimiento
-                    //Para todos los casos podemos deducir que la normal del plano cancela el movimiento en dicho plano.
-                    //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
 
                     Slider(lastPos, movementRay);
-                    //     EstablecerCheckpoint();
+
+                    //EstablecerCheckpoint();
                     //MoverObjetos(mesh, movementRay);
-                    CaerseAlAgua(mesh, movementRay);
+
+                    cruzarPuertas(mesh);
+
                     personajePrincipal.playAnimation("Caminando", true);
                     coleccionar(mesh);
                 }
@@ -392,21 +409,35 @@ namespace TGC.Group.Model.Escenarios
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
 
-        private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
+        private void cruzarPuertas(TgcMesh mesh)
         {
-            if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor"))
-            {
-                personajePrincipal.Position = principio;
-            }
+            if (mesh.Name.Contains("Puerta")){
+                if (puertaCruzada == 0){
+                    personajePrincipal.Position = puerta1;
+                    puertaCruzada += 1;
+                    return;
+                }
+                if (puertaCruzada == 1){
+                    personajePrincipal.Position = puerta2;
+                    puertaCruzada += 1;
+                    return;
+                }
+                if (puertaCruzada == 2){
+                    personajePrincipal.Position = puerta3;
+                    puertaCruzada += 1;
+                    return;
+                }
 
+            }
         }
 
+        
         private void coleccionar(TgcMesh mesh)
         {
             if (mesh.Name == "Box_1" && !coleccionables.Contains(mesh))
             {
                 coleccionables.Add(mesh);
-                cantidadDeLibros++;
+                cantidadColeccionables++;
                 mesh.BoundingBox = new Core.BoundingVolumes.TgcBoundingAxisAlignBox();
                 mesh.Dispose();
             }
