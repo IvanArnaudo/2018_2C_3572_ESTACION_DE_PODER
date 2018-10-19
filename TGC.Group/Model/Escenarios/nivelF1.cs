@@ -14,6 +14,7 @@ using TGC.Core.Input;
 using TGC.Core.Camara;
 using TGC.Core.BoundingVolumes;
 using System.Drawing;
+using TGC.Core.Geometry;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -58,8 +59,8 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcScene scene;
 
-        //private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
-        private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
+   //     private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
+       private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
@@ -118,11 +119,15 @@ namespace TGC.Group.Model.Escenarios
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
             //Prueba de rotacion
-            
+
             var RotPlat1 = TGCMatrix.RotationY(plataforma1.Rotation.Y);
             var TraslacPlat1 = TGCMatrix.Translation(plataforma1.Position);
             escalaBasePlat = RotPlat1 * TraslacPlat1;
             plataforma1.Transform = escalaBasePlat;
+
+            Console.WriteLine(scene.Meshes[64].Name);
+            Console.WriteLine(scene.Meshes[65].Name);
+            Console.WriteLine(scene.Meshes[66].Name);
 
         }
 
@@ -524,11 +529,11 @@ namespace TGC.Group.Model.Escenarios
 
         private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
         {
-            /*
-            if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Roof") == false)
+            
+            if ((mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor")) || mesh.Name == "Piso7-East-0" || mesh.Name == "Piso7-West-0" || mesh.Name == "Piso3-Roof-0" || mesh.Name == "Piso7-Floor-0" || mesh.Name == "Piso7-South-0")
             {
                 personajePrincipal.Position = puntoCheckpointActual;
-                }*/
+                }
             
         }
 
