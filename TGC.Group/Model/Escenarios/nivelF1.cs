@@ -125,9 +125,9 @@ namespace TGC.Group.Model.Escenarios
             escalaBasePlat = RotPlat1 * TraslacPlat1;
             plataforma1.Transform = escalaBasePlat;
 
-            Console.WriteLine(scene.Meshes[64].Name);
-            Console.WriteLine(scene.Meshes[65].Name);
-            Console.WriteLine(scene.Meshes[66].Name);
+            Console.WriteLine(scene.Meshes[57].Name);
+            Console.WriteLine(scene.Meshes[58].Name);
+            Console.WriteLine(scene.Meshes[59].Name);
 
         }
 
@@ -535,7 +535,7 @@ namespace TGC.Group.Model.Escenarios
         private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
         {
             
-            if ((mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor")) || mesh.Name == "Piso7-East-0" || mesh.Name == "Piso7-West-0" || mesh.Name == "Piso3-Roof-0" || mesh.Name == "Piso7-Floor-0" || mesh.Name == "Piso7-South-0")
+            if ((mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor")) || mesh.Name == "Subsuelo9-Floor-0")
             {
                 personajePrincipal.Position = puntoCheckpointActual;
                 }
