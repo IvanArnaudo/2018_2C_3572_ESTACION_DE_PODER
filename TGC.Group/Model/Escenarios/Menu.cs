@@ -23,7 +23,9 @@ namespace TGC.Group.Model.Escenarios
 
         public void init(string mediaDir, string shaderDir, TgcCamera camara)
         {
+
             inicio = new Boton("Inicio", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camara));
+     //     inicio = new Boton("Inicio", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(), camara));
             sprite = new Sprite(D3DDevice.Instance.Device);
             trustMe = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "imgMenu.png");
         }

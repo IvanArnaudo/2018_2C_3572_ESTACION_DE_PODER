@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Reflection;
 using System;
+using TGC.Core.Example;
 using TGC.Core.Sound;
 using TGC.Core.Input;
 using TGC.Core.Camara;
@@ -40,6 +41,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh collider;
         private TgcMesh floorCollider, ceilingCollider;
         private TGCMatrix escalaBase;
+        private TGCMatrix escalaBasePlat;
 
         private TGCVector3 lastColliderPos;
 
@@ -56,10 +58,12 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcScene scene;
 
-        private TGCVector3 puntoCheckpointActual = new TGCVector3(409, 151, 337);
+        //private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
+        private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
-        private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -100, 7900);
+        private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
+        private const float velocidadDeRotacion = 4f;
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
 
@@ -94,8 +98,8 @@ namespace TGC.Group.Model.Escenarios
                     });
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
-            
-            personajePrincipal.Position = new TGCVector3(400, 1, 400);
+
+            personajePrincipal.Position = puntoCheckpointActual;
            // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
@@ -112,7 +116,14 @@ namespace TGC.Group.Model.Escenarios
             reproductorMp3.FileName = pathDeLaCancion;
             //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
-           
+
+            //Prueba de rotacion
+            
+            var RotPlat1 = TGCMatrix.RotationY(plataforma1.Rotation.Y);
+            var TraslacPlat1 = TGCMatrix.Translation(plataforma1.Position);
+            escalaBasePlat = RotPlat1 * TraslacPlat1;
+            plataforma1.Transform = escalaBasePlat;
+
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -129,12 +140,16 @@ namespace TGC.Group.Model.Escenarios
                 lastColliderPos = floorCollider.Position;
 
             // Animacion de las plataformas
-
+         /*   var centro = plataforma1.BoundingBox.calculateBoxCenter();
+            plataforma1.RotateY(velocidadDeRotacion * deltaTime);*/
             plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
             if (FastMath.Abs(plataforma1.Position.Y) > 360f)
             {
                 direccionDeMovimientoActual *= -1;
             }
+            
+
+
 
             plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
             if (FastMath.Abs(plataforma2.Position.Y) > 360f)
@@ -509,10 +524,11 @@ namespace TGC.Group.Model.Escenarios
 
         private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
         {
+            /*
             if (mesh.Name.Contains("Agua") && mesh.Name.Contains("Roof") == false)
             {
                 personajePrincipal.Position = puntoCheckpointActual;
-                }
+                }*/
             
         }
 
