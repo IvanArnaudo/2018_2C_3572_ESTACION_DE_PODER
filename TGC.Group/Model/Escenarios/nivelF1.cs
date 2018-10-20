@@ -241,20 +241,8 @@ namespace TGC.Group.Model.Escenarios
             //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = personajePrincipal.Position;
 
-            objectsBehind.Clear();
-            objectsInFront.Clear();
-            foreach (var mesh in scene.Meshes)
-            {
-                TGCVector3 colisionCamara;
-                if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
-                {
-                    objectsBehind.Add(mesh);
-                }
-                else
-                {
-                    objectsInFront.Add(mesh);
-                }
-            }
+            
+            ajustarPosicionDeCamara();
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
@@ -599,8 +587,64 @@ namespace TGC.Group.Model.Escenarios
             }
             personajePrincipal.Position = lastPos - rs;
         }
+        private void ajustarPosicionDeCamara()
+        {
+            //Actualizar valores de camara segun modifiers
+            camaraInterna.OffsetHeight = 150;
+            camaraInterna.OffsetForward = 300;
+            var displacement = new TGCVector3(0,60,200);
+            camaraInterna.TargetDisplacement = new TGCVector3(displacement.X, displacement.Y, 0);
 
-       
+            //Pedirle a la camara cual va a ser su proxima posicion
+            TGCVector3 position;
+            TGCVector3 target;
+            camaraInterna.CalculatePositionTarget(out position, out target);
+
+            //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
+            TGCVector3 q;
+            var minDistSq = FastMath.Pow2(camaraInterna.OffsetForward);
+            objectsBehind.Clear();
+            objectsInFront.Clear();
+            foreach (var mesh in scene.Meshes)
+            {
+                TGCVector3 colisionCamara;
+                if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
+                {
+                    objectsBehind.Add(mesh);
+                }
+                else
+                {
+                    objectsInFront.Add(mesh);
+                    if (Math.Abs(mesh.BoundingBox.PMax.Y - mesh.BoundingBox.PMin.Y) < 60 )
+                        continue;
+                    if (TgcCollisionUtils.intersectSegmentAABB(target, position, mesh.BoundingBox, out q))
+                    {
+                        //Si hay colision, guardar la que tenga menor distancia
+                        float distSq = TGCVector3.Subtract(q, target).LengthSq();
+                        //Hay dos casos singulares, puede que tengamos mas de una colision hay que quedarse con el menor offset.
+                        //Si no dividimos la distancia por 2 se acerca mucho al target.
+                        minDistSq = FastMath.Min(distSq * 0.75f, minDistSq);
+                    }
+                }
+            }
+                //Hay colision del segmento camara-personaje y el objeto
+            
+
+            //Acercar la camara hasta la minima distancia de colision encontrada (pero ponemos un umbral maximo de cercania)
+            float newOffsetForward = -FastMath.Sqrt(minDistSq);
+
+            if (FastMath.Abs(newOffsetForward) < 10)
+            {
+                newOffsetForward = 10;
+            }
+            camaraInterna.OffsetForward = -newOffsetForward;
+
+            //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
+            camaraInterna.CalculatePositionTarget(out position, out target);
+            camaraInterna.SetCamera(position, target);
+        }
+
+
 
         /*private void cargarCancion(string direccionDeArchivo)
         {
@@ -613,7 +657,7 @@ namespace TGC.Group.Model.Escenarios
                 reproductorMp3.FileName = archivoActual;
             }
         }*/
-        
+
 
 
 
