@@ -12,6 +12,10 @@ using TGC.Core.Sound;
 using TGC.Core.Input;
 using TGC.Core.Camara;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Textures;
+using System.Drawing;
+using Microsoft.DirectX;
+using TGC.Group.Model.Interfaz;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -21,7 +25,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcScene scene;
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
-        private float velocidadDesplazamientoColeccionables = 10f;
+        private float velocidadDesplazamientoColeccionables = 25f;
         private float direccionDeMovimientoActual = 1;
 
         private TgcSkeletalMesh personajePrincipal;
@@ -38,6 +42,14 @@ namespace TGC.Group.Model.Escenarios
         private TGCMatrix escalaBase;
         private TGCVector3 lastColliderPos;
 
+        private Sprite HUD;
+        private TgcTexture vida;
+        private TgcTexture mumuki;
+        private int posVidas;
+        private int vidasRestantes = 3;
+        private Boton coleccionablesAdquiridos;
+
+
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
 
@@ -47,7 +59,8 @@ namespace TGC.Group.Model.Escenarios
 
         private List<TgcMesh> coleccionables = new List<TgcMesh>();
         private List<TgcMesh> coleccionablesAgarrados = new List<TgcMesh>();
-        private int cantidadColeccionables = 0;
+        private float cantidadColeccionables = 0;
+
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
         private string pathDeLaCancion;
@@ -56,11 +69,6 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 puerta2 = new TGCVector3(1705, 1, 337);
         private TGCVector3 puerta3 = new TGCVector3(3412, 1, 2103);
         private float puertaCruzada = 0;
-
-        // puerta1 = Puerta63
-        // puerta2 = Puerta64
-        // puerta3 = Puerta85
-        // mumukis = Box_4332 - 4340
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -76,10 +84,7 @@ namespace TGC.Group.Model.Escenarios
             scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml");
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
 
-
-            Console.WriteLine(scene.Meshes[62].Name);
-            Console.WriteLine(scene.Meshes[63].Name);
-
+            
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal = skeletalLoader.loadMeshAndAnimationsFromFile(
                                     MediaDir + "Robot\\Robot-TgcSkeletalMesh.xml",
@@ -96,18 +101,18 @@ namespace TGC.Group.Model.Escenarios
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
-            //coleccionables.Add(scene.Meshes[331]);
-            //coleccionables.Add(scene.Meshes[332]);
-            //coleccionables.Add(scene.Meshes[333]);
-            //coleccionables.Add(scene.Meshes[334]);
-            //coleccionables.Add(scene.Meshes[335]);
-            //coleccionables.Add(scene.Meshes[336]);
-            //coleccionables.Add(scene.Meshes[337]);
-            //coleccionables.Add(scene.Meshes[338]);
-            //coleccionables.Add(scene.Meshes[339]);
+            HUD = new Sprite(D3DDevice.Instance.Device);
+            vida = TgcTexture.createTexture(MediaDir + "Textures\\vida.png");
+            mumuki = TgcTexture.createTexture(MediaDir + "Textures\\iconoMumuki.png");
+
+            coleccionablesAdquiridos = new Boton(cantidadColeccionables.ToString(), 0.925f, 0.88f, null);
+
+            for (var i = 331; i <= 339; i++){
+                coleccionables.Add(scene.Meshes[i]);
+            }
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+           // reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -126,20 +131,7 @@ namespace TGC.Group.Model.Escenarios
             float rotate = 0;
             moving = false;
 
-
-            foreach (TgcMesh coleccionable in coleccionables)
-            {
-                if (!coleccionablesAgarrados.Contains(coleccionable))
-                {
-                    incremento = velocidadDesplazamientoColeccionables * direccionDeMovimientoActual * deltaTime;
-                    coleccionable.Move(0, incremento, 0);
-                    distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 1250f)
-                    {
-                        direccionDeMovimientoActual *= -1;
-                    }
-                }
-            }
+            MoverColeccionables(deltaTime);
 
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
@@ -170,7 +162,6 @@ namespace TGC.Group.Model.Escenarios
                 var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
                 var pmaxPersonaje = personajePrincipal.BoundingBox.PMax.Y;
 
-                //velocidadCaminar = 5;
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, 0, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 Movimiento.Scale(scale);
                 Movimiento.Y = jump;
@@ -185,20 +176,24 @@ namespace TGC.Group.Model.Escenarios
 
             camaraInterna.Target = personajePrincipal.Position;
 
-            objectsBehind.Clear();
-            objectsInFront.Clear();
-            foreach (var mesh in scene.Meshes)
-            {
-                TGCVector3 colisionCamara;
-                if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
-                {
-                    objectsBehind.Add(mesh);
-                }
-                else
-                {
-                    objectsInFront.Add(mesh);
-                }
-            }
+            //objectsBehind.Clear();
+            //objectsInFront.Clear();
+            //foreach (var mesh in scene.Meshes)
+            //{
+            //    TGCVector3 colisionCamara;
+            //    if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
+            //    {
+            //        objectsBehind.Add(mesh);
+            //    }
+            //    else
+            //    {
+            //        objectsInFront.Add(mesh);
+            //    }
+            //}
+
+            ajustarPosicionDeCamara();
+
+
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
@@ -215,9 +210,10 @@ namespace TGC.Group.Model.Escenarios
 
             // reproducirMusica();
 
+
             foreach (var mesh in objectsInFront)
             {
-                if (!coleccionables.Contains(mesh))
+                if (!coleccionablesAgarrados.Contains(mesh))
                 {
                     //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
                     //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
@@ -225,8 +221,26 @@ namespace TGC.Group.Model.Escenarios
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
-
             personajePrincipal.animateAndRender(deltaTime);
+
+            HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
+
+            posVidas = D3DDevice.Instance.Device.Viewport.Width - vida.Width;
+
+            for (int i = 0; i < vidasRestantes; i++)
+            {
+                HUD.Transform = TGCMatrix.Translation(new TGCVector3(posVidas, 0, 0));
+                HUD.Draw(vida.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.OrangeRed);
+                posVidas -= vida.Width;
+            }
+
+            coleccionablesAdquiridos.cambiarTexto(cantidadColeccionables.ToString());
+            coleccionablesAdquiridos.Render();
+            HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
+
+
+            HUD.End();
+
 
         }
 
@@ -237,20 +251,18 @@ namespace TGC.Group.Model.Escenarios
 
         public void dispose()
         {
-
+            personajePrincipal.Dispose(); //Dispose del personaje.
+            coleccionablesAdquiridos.Dispose();
             foreach (TgcMesh mesh in scene.Meshes)
             {
-                if (!coleccionables.Contains(mesh))
+                if (!coleccionablesAgarrados.Contains(mesh))
                 {
                     mesh.Dispose();
                 }
+                //scene.DisposeAll(); //Dispose de la escena.
+                reproductorMp3.closeFile();
             }
-            personajePrincipal.Dispose(); //Dispose del personaje.
-            //scene.DisposeAll(); //Dispose de la escena.
-
-            reproductorMp3.closeFile();
         }
-
 
         /////////////////////////////////////////////////////////////////////////
         /// ////////////////////////////MISC/////////////////////////////////////
@@ -306,9 +318,9 @@ namespace TGC.Group.Model.Escenarios
                     //EstablecerCheckpoint();
                     //MoverObjetos(mesh, movementRay);
 
-                    cruzarPuertas(mesh);
-
                     personajePrincipal.playAnimation("Caminando", true);
+
+                    CruzarPuertas(mesh);
                     coleccionar(mesh);
                 }
                 if (lastCollide == false)
@@ -319,6 +331,20 @@ namespace TGC.Group.Model.Escenarios
 
             }
 
+        }
+
+        private void MoverColeccionables(float deltaTime)
+        {
+            foreach (TgcMesh coleccionable in coleccionables)
+            {
+                incremento = velocidadDesplazamientoColeccionables * direccionDeMovimientoActual * deltaTime;
+                coleccionable.Move(0, incremento, 0);
+                distanciaRecorrida = distanciaRecorrida + incremento;
+                if (Math.Abs(distanciaRecorrida) > 100f)
+                {
+                    direccionDeMovimientoActual *= -1;
+                }
+            }
         }
 
         private void Salto(TgcD3dInput input)
@@ -409,7 +435,7 @@ namespace TGC.Group.Model.Escenarios
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
 
-        private void cruzarPuertas(TgcMesh mesh)
+        private void CruzarPuertas(TgcMesh mesh)
         {
             if (mesh.Name.Contains("Puerta")){
                 if (puertaCruzada == 0){
@@ -417,12 +443,12 @@ namespace TGC.Group.Model.Escenarios
                     puertaCruzada += 1;
                     return;
                 }
-                if (puertaCruzada == 1){
+                if (puertaCruzada == 1 && cantidadColeccionables == 3){
                     personajePrincipal.Position = puerta2;
                     puertaCruzada += 1;
                     return;
                 }
-                if (puertaCruzada == 2){
+                if (puertaCruzada == 2 && cantidadColeccionables == 6){
                     personajePrincipal.Position = puerta3;
                     puertaCruzada += 1;
                     return;
@@ -434,13 +460,72 @@ namespace TGC.Group.Model.Escenarios
         
         private void coleccionar(TgcMesh mesh)
         {
-            if (mesh.Name == "Box_1" && !coleccionables.Contains(mesh))
+            if (coleccionables.Contains(mesh)) 
             {
-                coleccionables.Add(mesh);
+                coleccionablesAgarrados.Add(mesh);
+                coleccionables.Remove(mesh);
+                //scene.Meshes.Remove(mesh);
                 cantidadColeccionables++;
                 mesh.BoundingBox = new Core.BoundingVolumes.TgcBoundingAxisAlignBox();
                 mesh.Dispose();
             }
+        }
+
+        private void ajustarPosicionDeCamara()
+        {
+            //Actualizar valores de camara segun modifiers
+            camaraInterna.OffsetHeight = 150;
+            camaraInterna.OffsetForward = 300;
+            var displacement = new TGCVector3(0, 60, 200);
+            camaraInterna.TargetDisplacement = new TGCVector3(displacement.X, displacement.Y, 0);
+
+            //Pedirle a la camara cual va a ser su proxima posicion
+            TGCVector3 position;
+            TGCVector3 target;
+            camaraInterna.CalculatePositionTarget(out position, out target);
+
+            //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
+            TGCVector3 q;
+            var minDistSq = FastMath.Pow2(camaraInterna.OffsetForward);
+            objectsBehind.Clear();
+            objectsInFront.Clear();
+            foreach (var mesh in scene.Meshes)
+            {
+                TGCVector3 colisionCamara;
+                if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
+                {
+                    objectsBehind.Add(mesh);
+                }
+                else
+                {
+                    objectsInFront.Add(mesh);
+                    if (Math.Abs(mesh.BoundingBox.PMax.Y - mesh.BoundingBox.PMin.Y) < 60)
+                        continue;
+                    if (TgcCollisionUtils.intersectSegmentAABB(target, position, mesh.BoundingBox, out q))
+                    {
+                        //Si hay colision, guardar la que tenga menor distancia
+                        float distSq = TGCVector3.Subtract(q, target).LengthSq();
+                        //Hay dos casos singulares, puede que tengamos mas de una colision hay que quedarse con el menor offset.
+                        //Si no dividimos la distancia por 2 se acerca mucho al target.
+                        minDistSq = FastMath.Min(distSq * 0.75f, minDistSq);
+                    }
+                }
+            }
+            //Hay colision del segmento camara-personaje y el objeto
+
+
+            //Acercar la camara hasta la minima distancia de colision encontrada (pero ponemos un umbral maximo de cercania)
+            float newOffsetForward = -FastMath.Sqrt(minDistSq);
+
+            if (FastMath.Abs(newOffsetForward) < 10)
+            {
+                newOffsetForward = 10;
+            }
+            camaraInterna.OffsetForward = -newOffsetForward;
+
+            //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
+            camaraInterna.CalculatePositionTarget(out position, out target);
+            camaraInterna.SetCamera(position, target);
         }
 
 

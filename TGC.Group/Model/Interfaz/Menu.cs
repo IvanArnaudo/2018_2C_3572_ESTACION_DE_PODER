@@ -13,7 +13,7 @@ namespace TGC.Group.Model.Interfaz
     {
         //Protected para que puedan ser utilizados por las clases que heredan de Menu
         protected TgcText2D texto;
-        protected Font fuente = new Font("Impact", 25, FontStyle.Regular, GraphicsUnit.Pixel); //"Lucida Console" "Impact" "Fixedsys" "Arial"
+        protected Font fuente = new Font("Impact", 22, FontStyle.Regular, GraphicsUnit.Pixel); //"Lucida Console" "Impact" "Fixedsys" "Arial"
         protected Size tamanio;
 
         //esto es para poder heredar de IRenderObject
