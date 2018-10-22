@@ -1,5 +1,4 @@
-﻿using System;
-using TGC.Group.Model.Interfaz;
+﻿using TGC.Group.Model.Interfaz;
 using TGC.Core.Textures;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Direct3D;
@@ -19,8 +18,6 @@ namespace TGC.Group.Model.Escenarios
         private Sprite sprite;
         private TgcTexture trustMe;
         private Viewport vp = D3DDevice.Instance.Device.Viewport;
-
-        
 
         public void init(string mediaDir, string shaderDir, TgcCamera camara)
         {
@@ -45,15 +42,11 @@ namespace TGC.Group.Model.Escenarios
             sprite.Transform = TGCMatrix.Scaling(scaling);
             sprite.Draw(trustMe.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
 
-            //sprite.Transform = TGCMatrix.Translation(new TGCVector3(vp.Width / 2 - logo.Width / 2, 0, 0));
-            //sprite.Draw(logo.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
-
             sprite.End();
 
             inicio.Render();
             lvlPDP.Render();
         }
-
 
 
         public void dispose()

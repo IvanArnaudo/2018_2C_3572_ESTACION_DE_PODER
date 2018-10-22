@@ -19,9 +19,9 @@ namespace TGC.Group.Model.Interfaz
             texto.Text = text;
         }
 
-        public override void Update(float deltaTime, TgcD3dInput input)
-        {
+        public override void Update(float deltaTime, TgcD3dInput input){
             //si el mouse pasa por encima del boton:
+            //si quieren usarlo solo como texto, no lo updateen y listo
             if (input.Xpos >= getBounds().X && 
                 input.Xpos <= getBounds().X + getBounds().Width &&
                  

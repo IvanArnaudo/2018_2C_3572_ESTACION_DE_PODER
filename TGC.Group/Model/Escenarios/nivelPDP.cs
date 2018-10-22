@@ -56,11 +56,13 @@ namespace TGC.Group.Model.Escenarios
         private List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private List<TgcMesh> objectsInFront = new List<TgcMesh>();
 
-
         private List<TgcMesh> coleccionables = new List<TgcMesh>();
         private List<TgcMesh> coleccionablesAgarrados = new List<TgcMesh>();
-        private float cantidadColeccionables = 0;
+        private float cantidadColeccionablesAgarrados = 0;
 
+        private List<TgcMesh> botones = new List<TgcMesh>();
+        private List<TgcMesh> botonesActivados = new List<TgcMesh>();
+        private float cantidadBotonesActivados = 0;
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
         private string pathDeLaCancion;
@@ -95,7 +97,8 @@ namespace TGC.Group.Model.Escenarios
                                     });
 
             personajePrincipal.playAnimation("Parado", true);
-            personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            //personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -105,10 +108,14 @@ namespace TGC.Group.Model.Escenarios
             vida = TgcTexture.createTexture(MediaDir + "Textures\\vida.png");
             mumuki = TgcTexture.createTexture(MediaDir + "Textures\\iconoMumuki.png");
 
-            coleccionablesAdquiridos = new Boton(cantidadColeccionables.ToString(), 0.925f, 0.88f, null);
+            coleccionablesAdquiridos = new Boton(cantidadColeccionablesAgarrados.ToString(), 0.925f, 0.88f, null);
 
             for (var i = 331; i <= 339; i++){
                 coleccionables.Add(scene.Meshes[i]);
+            }
+
+            for (var i = 269; i<= 308; i++){
+                botones.Add(scene.Meshes[i]);
             }
 
             reproductorMp3.FileName = pathDeLaCancion;
@@ -176,21 +183,6 @@ namespace TGC.Group.Model.Escenarios
 
             camaraInterna.Target = personajePrincipal.Position;
 
-            //objectsBehind.Clear();
-            //objectsInFront.Clear();
-            //foreach (var mesh in scene.Meshes)
-            //{
-            //    TGCVector3 colisionCamara;
-            //    if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
-            //    {
-            //        objectsBehind.Add(mesh);
-            //    }
-            //    else
-            //    {
-            //        objectsInFront.Add(mesh);
-            //    }
-            //}
-
             ajustarPosicionDeCamara();
 
 
@@ -215,8 +207,8 @@ namespace TGC.Group.Model.Escenarios
             {
                 if (!coleccionablesAgarrados.Contains(mesh))
                 {
-                    //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
-                    //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                //        var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
+                //        if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
                     mesh.Render();
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
@@ -234,7 +226,7 @@ namespace TGC.Group.Model.Escenarios
                 posVidas -= vida.Width;
             }
 
-            coleccionablesAdquiridos.cambiarTexto(cantidadColeccionables.ToString());
+            coleccionablesAdquiridos.cambiarTexto(cantidadColeccionablesAgarrados.ToString());
             coleccionablesAdquiridos.Render();
             HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
 
@@ -321,7 +313,8 @@ namespace TGC.Group.Model.Escenarios
                     personajePrincipal.playAnimation("Caminando", true);
 
                     CruzarPuertas(mesh);
-                    coleccionar(mesh);
+                    ActivarBotones(mesh);
+                    Coleccionar(mesh);
                 }
                 if (lastCollide == false)
                 {
@@ -435,6 +428,18 @@ namespace TGC.Group.Model.Escenarios
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
 
+        private void ActivarBotones(TgcMesh mesh){
+            if (botones.Contains(mesh)){
+                //mesh.addDiffuseMap(activado);
+                mesh.setColor(Color.Green);
+                botonesActivados.Add(mesh);
+                botones.Remove(mesh);
+                cantidadBotonesActivados++;
+            }
+
+        }
+
+
         private void CruzarPuertas(TgcMesh mesh)
         {
             if (mesh.Name.Contains("Puerta")){
@@ -443,12 +448,12 @@ namespace TGC.Group.Model.Escenarios
                     puertaCruzada += 1;
                     return;
                 }
-                if (puertaCruzada == 1 && cantidadColeccionables == 3){
+                if (puertaCruzada == 1 && cantidadColeccionablesAgarrados == 3){
                     personajePrincipal.Position = puerta2;
                     puertaCruzada += 1;
                     return;
                 }
-                if (puertaCruzada == 2 && cantidadColeccionables == 6){
+                if (puertaCruzada == 2 && cantidadColeccionablesAgarrados == 6){
                     personajePrincipal.Position = puerta3;
                     puertaCruzada += 1;
                     return;
@@ -458,14 +463,13 @@ namespace TGC.Group.Model.Escenarios
         }
 
         
-        private void coleccionar(TgcMesh mesh)
+        private void Coleccionar(TgcMesh mesh)
         {
             if (coleccionables.Contains(mesh)) 
             {
                 coleccionablesAgarrados.Add(mesh);
                 coleccionables.Remove(mesh);
-                //scene.Meshes.Remove(mesh);
-                cantidadColeccionables++;
+                cantidadColeccionablesAgarrados++;
                 mesh.BoundingBox = new Core.BoundingVolumes.TgcBoundingAxisAlignBox();
                 mesh.Dispose();
             }

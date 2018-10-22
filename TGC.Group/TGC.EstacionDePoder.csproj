@@ -99,6 +99,7 @@
     <Compile Include="Model\Escenarios\Menu.cs" />
     <Compile Include="Model\Escenarios\nivelF1.cs" />
     <Compile Include="Model\Escenarios\nivelPDP.cs" />
+    <Compile Include="Model\Escenarios\Victoria.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Interfaz\Boton.cs" />
     <Compile Include="Model\Interfaz\Menu.cs" />
