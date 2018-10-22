@@ -97,6 +97,7 @@
     <Compile Include="Model\Escenarios\AdministradorDeEscenarios.cs" />
     <Compile Include="Model\Escenarios\Escenario.cs" />
     <Compile Include="Model\Escenarios\Menu.cs" />
+    <Compile Include="Model\Escenarios\GameOver.cs" />
     <Compile Include="Model\Escenarios\nivelF1.cs" />
     <Compile Include="Model\Escenarios\nivelPDP.cs" />
     <Compile Include="Model\Escenarios\Victoria.cs" />

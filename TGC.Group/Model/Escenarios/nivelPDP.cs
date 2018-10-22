@@ -228,7 +228,9 @@ namespace TGC.Group.Model.Escenarios
 
             coleccionablesAdquiridos.cambiarTexto(cantidadColeccionablesAgarrados.ToString());
             coleccionablesAdquiridos.Render();
-            HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
+
+          //Ivo te comenté esta linea porque me rompia todo y no me dejaba probar nada huehuehu3
+          //  HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
 
 
             HUD.End();

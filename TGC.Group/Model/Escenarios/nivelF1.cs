@@ -59,14 +59,15 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcScene scene;
 
-   //     private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
-       private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
+        private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
+   //    private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
         private const float velocidadDeRotacion = 4f;
         private float incremento = 0f, rotAngle = 0;
         private float distanciaRecorrida = 0f;
+        private float cantVidas;
 
         private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(839, 591, 4969), new TGCVector3(23, 395, 5120));
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
@@ -128,6 +129,8 @@ namespace TGC.Group.Model.Escenarios
             Console.WriteLine(scene.Meshes[57].Name);
             Console.WriteLine(scene.Meshes[58].Name);
             Console.WriteLine(scene.Meshes[59].Name);
+
+            cantVidas = 0;
 
         }
 
@@ -522,11 +525,17 @@ namespace TGC.Group.Model.Escenarios
 
         private void CaerseAlAgua(TgcMesh mesh, TGCVector3 movementRay)
         {
-            
+
             if ((mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor")) || mesh.Name == "Subsuelo9-Floor-0")
             {
-                personajePrincipal.Position = puntoCheckpointActual;
+                if (cantVidas < 0)
+                {
+                    AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameOver(), camaraInterna);
                 }
+                personajePrincipal.Position = puntoCheckpointActual;
+                cantVidas--;
+            
+            }
             
         }
 
