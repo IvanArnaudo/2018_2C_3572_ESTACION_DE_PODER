@@ -59,12 +59,13 @@ namespace TGC.Group.Model.Escenarios
 
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
 
-        private int cantidadDeLibros = 0;
+        private float cantidadDeLibros = 0;
 
         private TgcScene scene;
 
-        private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
-   //    private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
+        //     private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
+        //     private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
+        private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
@@ -106,12 +107,12 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.playAnimation("Parado", true);
 
             personajePrincipal.Position = puntoCheckpointActual;
-           // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
-         // camara = camaraInterna;
+            // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
             plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
@@ -130,14 +131,15 @@ namespace TGC.Group.Model.Escenarios
             escalaBasePlat = RotPlat1 * TraslacPlat1;
             plataforma1.Transform = escalaBasePlat;
 
-            Console.WriteLine(scene.Meshes[57].Name);
-            Console.WriteLine(scene.Meshes[58].Name);
-            Console.WriteLine(scene.Meshes[59].Name);
+            Console.WriteLine(scene.Meshes[175].Name);
+            Console.WriteLine(scene.Meshes[176].Name);
+            Console.WriteLine(scene.Meshes[177].Name);
             //foreach (var mesh in scene.Meshes)
-              //  slowSliders.Add(mesh);
+            //  slowSliders.Add(mesh);
 
-            cantVidas = 0;
+            cantVidas = 1;
 
+           
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -418,6 +420,7 @@ namespace TGC.Group.Model.Escenarios
                //     EstablecerCheckpoint();
                     MoverObjetos(mesh, movementRay);
                     CaerseAlAgua(mesh,movementRay);
+                    verSiSeCompletoNivel(mesh);
                     personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
@@ -544,7 +547,7 @@ namespace TGC.Group.Model.Escenarios
 
             if ((mesh.Name.Contains("Agua") && mesh.Name.Contains("Floor")) || mesh.Name == "Subsuelo9-Floor-0")
             {
-                if (cantVidas < 0)
+                if (cantVidas < 1)
                 {
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameOver(), camaraInterna);
                 }
@@ -554,6 +557,22 @@ namespace TGC.Group.Model.Escenarios
             }
             
         }
+
+        private void verSiSeCompletoNivel(TgcMesh mesh)
+        {
+
+            if (mesh.Name.Contains("Box_8"))
+            {
+                if (cantidadDeLibros >= 4)
+                {
+                    AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camaraInterna);
+                }
+              
+            }
+
+        }
+
+
 
         private void AgarrarLibros(TgcMesh mesh)
         {
