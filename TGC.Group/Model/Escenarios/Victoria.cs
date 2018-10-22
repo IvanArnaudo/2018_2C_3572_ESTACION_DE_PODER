@@ -7,6 +7,8 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using System.Drawing;
 using Microsoft.DirectX;
+using TGC.Core.Sound;
+
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -16,12 +18,20 @@ namespace TGC.Group.Model.Escenarios
         private TgcTexture victory;
         private Sprite sprite;
         private Viewport vp = D3DDevice.Instance.Device.Viewport;
+        private TgcMp3Player reproductorMp3 = new TgcMp3Player();
+        private string pathDeLaCancion;
+
 
         public void init(string mediaDir, string shaderDir, TgcCamera camara){
-            volver = new Boton("Volver al Menú principal", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new Menu(), camara));
+            pathDeLaCancion = mediaDir + "Musica\\MissionComplete.mp3";
+            reproductorMp3.FileName = pathDeLaCancion;
+            reproductorMp3.play(true);
+
+            volver = new Boton("Volver al Menú principal", 0f, 0.8f, () => { reproductorMp3.closeFile(); AdministradorDeEscenarios.getSingleton().agregarEscenario(new Menu(), camara); });
             texto = new Boton("Felicidades, aprobaste 2 materias ¿Hasta dónde llegarás?", 0f, 0.7f, null);
             sprite = new Sprite(D3DDevice.Instance.Device);
             victory = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "victory.jpg");
+
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
@@ -46,6 +56,8 @@ namespace TGC.Group.Model.Escenarios
         public void dispose(){
             volver.Dispose();
             texto.Dispose();
+            reproductorMp3.closeFile();
+
         }
 
 
