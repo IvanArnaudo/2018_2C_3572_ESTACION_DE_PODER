@@ -204,6 +204,9 @@ namespace TGC.Group.Model.Escenarios
             escalaBase = Rot * T;
             personajePrincipal.Transform = escalaBase;
 
+
+
+
         }
 
         /////////////////////////////////////////////////////////////////////////

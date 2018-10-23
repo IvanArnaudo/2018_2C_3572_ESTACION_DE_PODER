@@ -28,8 +28,6 @@ namespace TGC.Group.Model.Escenarios
         private float direccionDeMovimientoActual = 1;
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
-        private List<TgcMesh> meshesDeLaEscena;
-
         private float jumping;
         private bool moving = false, enElPiso = true;
         private bool rotating = false;
@@ -52,18 +50,27 @@ namespace TGC.Group.Model.Escenarios
         private TGCBox plataforma1;
         private TGCBox plataforma2;
 
-        private TgcMesh BBplataforma1;
-        private TgcMesh BBplataforma2;
-
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
 
         private string pathDeLaCancion;
 
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
 
+        TgcMesh plataforma1EnMesh;
+        TgcMesh plataforma2EnMesh;
+
+        TGCVector3 centroPlataforma1 = new TGCVector3(2520, -195, 585);
+        TGCVector3 tamanioPlataforma1 = new TGCVector3(100, 20, 100);
+        Color colorPlataforma1 = Color.Black;
+
+        TGCVector3 centroPlataforma2 = new TGCVector3(2520, -195, 305);
+        TGCVector3 tamanioPlataforma2 = new TGCVector3(100, 20, 100);
+
         private int cantidadDeLibros = 0;
 
         private TgcScene scene;
+
+ 
 
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
         private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
@@ -76,6 +83,8 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(839, 591, 4969), new TGCVector3(23, 395, 5120));
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
+        private TGCMatrix escalaBasePlat2;
+
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -90,7 +99,7 @@ namespace TGC.Group.Model.Escenarios
 
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
 
-            meshesDeLaEscena = new List<TgcMesh>();
+      
 
             var skeletalLoader = new TgcSkeletalLoader();
             personajePrincipal =
@@ -121,23 +130,21 @@ namespace TGC.Group.Model.Escenarios
 
             //plataforma1:
 
-            var centroPlataforma1 = new TGCVector3(2520, -195, 585);
-            var tamanioPlataforma1 = new TGCVector3(100, 20, 100);
-            var colorPLataforma1 = Color.Black;
-            plataforma1 = TGCBox.fromSize(centroPlataforma1,tamanioPlataforma1, colorPLataforma1);
-            plataforma1.Transform = TGCMatrix.Translation(centroPlataforma1);
-            TgcMesh plataforma1EnMesh = plataforma1.ToMesh("plataforma1Subsuelo");
-            meshesDeLaEscena.Add(plataforma1EnMesh);
+          
+            plataforma1 = TGCBox.fromSize(centroPlataforma1,tamanioPlataforma1, colorPlataforma1);
+            plataforma1EnMesh = plataforma1.ToMesh("plataforma1Subsuelo");
+            plataforma1EnMesh.Position = centroPlataforma1;
+            plataforma1EnMesh.Transform = TGCMatrix.Translation(centroPlataforma1);
+            scene.Meshes.Add(plataforma1EnMesh);
+
 
             //plataforma2:
 
-            var centroPlataforma2 = new TGCVector3(2520, -195, 305);
-            var tamanioPlataforma2 = new TGCVector3(100, 20, 100);
-            var colorPlataforma2 = Color.Black;
-            plataforma2 = TGCBox.fromSize(centroPlataforma2,tamanioPlataforma2, colorPlataforma2);
-            plataforma2.Transform = TGCMatrix.Translation(centroPlataforma2);
-            TgcMesh plataforma2EnMesh = plataforma2.ToMesh("plataforma1Subsuelo");
-            meshesDeLaEscena.Add(plataforma2EnMesh);
+            plataforma2 = TGCBox.fromSize(centroPlataforma2,tamanioPlataforma2, colorPlataforma1);
+            plataforma2EnMesh = plataforma2.ToMesh("plataforma1Subsuelo");
+            plataforma2EnMesh.Position = centroPlataforma2;
+            plataforma2EnMesh.Transform = TGCMatrix.Translation(centroPlataforma2);
+            scene.Meshes.Add(plataforma2EnMesh);
 
 
             plataformasMovibles.Add(plataforma1EnMesh);
@@ -147,9 +154,15 @@ namespace TGC.Group.Model.Escenarios
             //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
-            Console.WriteLine(plataforma1.Position);
-            Console.WriteLine(plataforma2.Position);
-
+            Console.WriteLine(plataforma1EnMesh.Position);
+            Console.WriteLine(plataforma2EnMesh.Position);
+            
+/*
+            plataforma1.Dispose();
+            plataforma1.BoundingBox.Dispose();
+            plataforma2.Dispose();
+            plataforma2.BoundingBox.Dispose();
+*/
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -165,24 +178,8 @@ namespace TGC.Group.Model.Escenarios
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
 
-            // Animacion de las plataformas
-
-            //plataforma1.RotateY(velocidadDeRotacion * deltaTime);
-
-            //plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
-            //if (FastMath.Abs(plataforma1.Position.Y) > 360f)
-            //{
-            //   direccionDeMovimientoActual *= -1;
-            //}
             
-
-            //plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
-            //if (FastMath.Abs(plataforma2.Position.Y) > 360f)
-            //{
-            //    direccionDeMovimientoActual *= -1;
-            //}
-
-            //Animacion de los libros de F1
+            //-------------------------------------------------------------Animacion de los libros de F1
 
             foreach (TgcMesh libro in scene.Meshes)
             {
@@ -197,7 +194,7 @@ namespace TGC.Group.Model.Escenarios
                     }
                 }
             }
-
+            //--------------------------------------------------------------
 
             var moveForward = 0f;
             float rotate = 0;
@@ -263,6 +260,10 @@ namespace TGC.Group.Model.Escenarios
 
             objectsBehind.Clear();
             objectsInFront.Clear();
+
+
+
+            //----------------------------------------------------Camara render selectivo
             foreach (var mesh in scene.Meshes)
             {
                 TGCVector3 colisionCamara;
@@ -275,17 +276,47 @@ namespace TGC.Group.Model.Escenarios
                     objectsInFront.Add(mesh);
                 }
             }
+            //-----------------------------------------------------
+
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
             personajePrincipal.Transform = escalaBase;
 
+
+
+
+
+
+
+            // Animacion de las plataformas
+            
+
+
+            //plataforma1.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
+            //if (FastMath.Abs(plataforma2.Position.Y) > 360f)
+            //{
+            //    direccionDeMovimientoActual *= -1;
+            //}
+
+
+
+            plataforma2EnMesh.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
+            if (FastMath.Abs(plataforma2EnMesh.Position.Y) > 360f)
+            {
+               direccionDeMovimientoActual *= -1;
+            }
+
+
             var anguloRotacionPlataforma = Geometry.DegreeToRadian(velocidadDeRotacion * deltaTime);
-            plataforma1.RotateY(anguloRotacionPlataforma);
-            var RotPlat1 = TGCMatrix.RotationY(plataforma1.Rotation.Y);
-            var TraslacPlat1 = TGCMatrix.Translation(plataforma1.Position);
-            escalaBasePlat = RotPlat1 * TraslacPlat1;
-            plataforma1.Transform = escalaBasePlat;
+
+            plataforma2EnMesh.RotateY(anguloRotacionPlataforma);
+
+            var RotPlat2 = TGCMatrix.RotationY(plataforma2EnMesh.Rotation.Y);
+            var TraslacPlat2 = TGCMatrix.Translation(plataforma2EnMesh.Position);
+            escalaBasePlat2 = RotPlat2 * TraslacPlat2;
+            plataforma2EnMesh.Transform = escalaBasePlat;
+
             //Console.WriteLine(plataforma1.Position);
             //Console.WriteLine(plataforma2.Position);
         }
@@ -310,10 +341,13 @@ namespace TGC.Group.Model.Escenarios
            //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
+
+
+            /*
             plataforma1.Render();
             plataforma1.BoundingBox.Render();
             plataforma2.Render();
-            plataforma2.BoundingBox.Render();
+            plataforma2.BoundingBox.Render(); */
 
             personajePrincipal.animateAndRender(deltaTime);
 
@@ -337,10 +371,6 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.Dispose(); //Dispose del personaje.
             //scene.DisposeAll(); //Dispose de la escena.
 
-            plataforma1.Dispose();
-            plataforma1.BoundingBox.Dispose();
-            plataforma2.Dispose();
-            plataforma2.BoundingBox.Dispose();
 
             reproductorMp3.closeFile();
         }
@@ -349,10 +379,13 @@ namespace TGC.Group.Model.Escenarios
         /// ////////////////////////////MISC/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
 
+
         private bool DistanciaAlPisoSalto()
         {
             return floorCollider != null && Math.Abs(personajePrincipal.BoundingBox.PMin.Y - floorCollider.BoundingBox.PMax.Y) < 10;
         }
+
+
 
         private void DetectarColisionesMovibles(TGCVector3 lastPos, TgcMesh meshAProbar)
         {
@@ -447,9 +480,9 @@ namespace TGC.Group.Model.Escenarios
                     //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
 
                     Slider(lastPos, movementRay, dtime);
-               //     EstablecerCheckpoint();
+                    //     EstablecerCheckpoint();
                     MoverObjetos(mesh, movementRay);
-                    CaerseAlAgua(mesh,movementRay);
+                    CaerseAlAgua(mesh, movementRay);
                     personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
@@ -464,8 +497,9 @@ namespace TGC.Group.Model.Escenarios
                     enElPiso = false;
 
             }
-
         }
+
+
 
 
         private void Salto(TgcD3dInput input)
@@ -527,6 +561,8 @@ namespace TGC.Group.Model.Escenarios
                 }
             }
         }
+
+
         private float Rotacion()
         {
             rotating = true;
