@@ -46,7 +46,6 @@ namespace TGC.Group.Model.Escenarios
         List<TgcMesh> slowSliders = new List<TgcMesh>();
         List<TgcMesh> fastSliders = new List<TgcMesh>();
 
-
         private Sprite HUD;
         private TgcTexture vida;
         private TgcTexture mumuki;
@@ -66,18 +65,20 @@ namespace TGC.Group.Model.Escenarios
 
         private List<TgcMesh> dangerPlaces = new List<TgcMesh>();
 
-
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
         private string pathDeLaCancion;
 
         private TGCVector3 ultimoCP;
+
+        private TGCVector3 charco1;
+        private TGCVector3 charco2;
+        private TGCVector3 charco3;
 
         private TGCVector3 puerta1 = new TGCVector3(900, 1, 337);
         private TGCVector3 puerta2 = new TGCVector3(1705, 1, 337);
         private TGCVector3 puerta3 = new TGCVector3(3412, 1, 2103);
         private float puertaCruzada = 0;
 
-        //plataforma movil 85
 
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
@@ -125,9 +126,27 @@ namespace TGC.Group.Model.Escenarios
             fastSliders.Add(scene.Meshes[295]);
             fastSliders.Add(scene.Meshes[296]);
             fastSliders.Add(scene.Meshes[305]);
+            
+            charco1 = scene.Meshes[295].Position;
+            charco2 = scene.Meshes[296].Position;
+            charco3 = scene.Meshes[305].Position;
+
+            charco1.Y = charco1.Y + 30;
+            charco2.Y = charco2.Y + 30;
+            charco3.Y = charco3.Y + 30;
+
+            scene.Meshes[295].BoundingBox.move(charco1);
+            scene.Meshes[296].BoundingBox.move(charco2);
+            scene.Meshes[305].BoundingBox.move(charco3);
 
             //Añado el piso de la cafetería como modificador de la velocidad
             slowSliders.Add(scene.Meshes[270]);
+
+            Console.WriteLine("SlowSlider");
+            foreach (TgcMesh mesh in slowSliders)
+            {
+                Console.WriteLine(mesh.Name);
+            }
 
             //Añado zonas de muerte
             dangerPlaces.Add(scene.Meshes[14]);
@@ -136,7 +155,7 @@ namespace TGC.Group.Model.Escenarios
             dangerPlaces.Add(scene.Meshes[46]);
 
             reproductorMp3.FileName = pathDeLaCancion;
-           // reproductorMp3.play(true);
+            reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -146,7 +165,7 @@ namespace TGC.Group.Model.Escenarios
         /// /////////////////////////////////////////////////////////////////////
 
 
-        public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
+        public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
 
             velocidadCaminar = 5;
             if (floorCollider != null) lastColliderPos = floorCollider.Position;
@@ -162,7 +181,7 @@ namespace TGC.Group.Model.Escenarios
             Salto(input);
             AplicarGravedad(deltaTime);
 
-            if (rotating){
+            if (rotating) {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
                 rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
@@ -202,6 +221,8 @@ namespace TGC.Group.Model.Escenarios
 
             ajustarPosicionDeCamara();
 
+           // if (puertaCruzada == 3) moverPlatafoma(deltaTime);
+            
 
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
@@ -209,6 +230,8 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.Transform = escalaBase;
 
         }
+
+     
 
         /////////////////////////////////////////////////////////////////////////
         /// ////////////////////////////RENDER///////////////////////////////////
@@ -230,6 +253,7 @@ namespace TGC.Group.Model.Escenarios
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
+
             personajePrincipal.animateAndRender(deltaTime);
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
@@ -301,7 +325,7 @@ namespace TGC.Group.Model.Escenarios
 
 
                 //Hubo colisión con un objeto. Guardar resultado y abortar loop.
-                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && !(fastSliders.Contains(mesh)))
                 {
                     if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
                     {
@@ -314,12 +338,7 @@ namespace TGC.Group.Model.Escenarios
                             sliderFloorCollider = mesh;
                             sliderModifier = 1f;
                         }
-                        else if (fastSliders.Contains(mesh))
-                        {
-                            sliderModifierType = "fast";
-                            sliderFloorCollider = mesh;
-                            sliderModifier = 3;
-                        }
+
                     }
                     else if (sceneMeshBoundingBox.PMin.Y > pmaxYAnteriorPersonaje && jump != 0)
                     {
@@ -337,17 +356,20 @@ namespace TGC.Group.Model.Escenarios
 
                     Slider(lastPos, movementRay);
 
-                    //EstablecerCheckpoint();
-
                     personajePrincipal.playAnimation("Caminando", true);
                     Coleccionar(mesh);
                     CruzarPuertas(mesh);
                     Caer(mesh);
+
+                } else if(collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && fastSliders.Contains(mesh)){
+                        sliderModifierType = "fast";
+                        sliderFloorCollider = mesh;
+                        sliderModifier = 2f;
                 }
                 if (lastCollide == false)
                 {
                     enElPiso = false;
-                    //floorCollider = null;
+                    //sliderFloorCollider = null;
                 }
 
             }
@@ -470,7 +492,6 @@ namespace TGC.Group.Model.Escenarios
             }
         }
 
-
         private void CruzarPuertas(TgcMesh mesh)
         {
             if (mesh.Name.Contains("Puerta")){
@@ -494,6 +515,7 @@ namespace TGC.Group.Model.Escenarios
 
                 if (puertaCruzada == 3 && cantidadColeccionablesAgarrados == 9)
                 {
+                    reproductorMp3.closeFile();
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new Victoria(), camaraInterna);
                 }
 
@@ -629,8 +651,8 @@ namespace TGC.Group.Model.Escenarios
 
         private void handleFastSliderModifier()
         {
-            if (floorCollider == null || sliderFloorCollider == null || (floorCollider != sliderFloorCollider && enElPiso))
-                sliderModifier = 3;
+            if (floorCollider == null || sliderFloorCollider == null || (floorCollider != sliderFloorCollider /*&& enElPiso*/))
+                sliderModifier = 1;
         }
 
         private void handleSlowSliderModifier()
