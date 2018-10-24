@@ -121,7 +121,7 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.playAnimation("Parado", true);
 
             personajePrincipal.Position = puntoCheckpointActual;
-            // personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
@@ -480,7 +480,8 @@ namespace TGC.Group.Model.Escenarios
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
-                jumping = 400.5f;
+                jumping = 280f;
+                //jumping = 400.5f;
                 moving = true;
                 enElPiso = false;
             }
@@ -603,6 +604,7 @@ namespace TGC.Group.Model.Escenarios
             {
                 if (cantidadLibrosAdquiridos >= 10)
                 {
+                    reproductorMp3.closeFile();
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camaraInterna);
                 } else
                 {
