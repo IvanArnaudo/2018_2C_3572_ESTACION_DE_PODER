@@ -14,15 +14,15 @@ namespace TGC.Group.Model.Escenarios
     {
         //private Action cargarNivel1 = () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(),camara);
         private Boton inicio;
-        private Boton lvlPDP;
+        //private Boton lvlPDP;
         private Sprite sprite;
         private TgcTexture trustMe;
         private Viewport vp = D3DDevice.Instance.Device.Viewport;
 
         public void init(string mediaDir, string shaderDir, TgcCamera camara)
         {
-            inicio = new Boton("FISICA1", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(), camara));
-            lvlPDP = new Boton("PDP", 0f, 0.7f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camara));
+            inicio = new Boton("INICIO", 0f, 0.8f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelF1(), camara));
+            //lvlPDP = new Boton("PDP", 0f, 0.7f, () => AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camara));
             sprite = new Sprite(D3DDevice.Instance.Device);
             trustMe = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "imgMenu.png");
         }
@@ -30,7 +30,7 @@ namespace TGC.Group.Model.Escenarios
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara)
         {
             inicio.Update(deltaTime, input);
-            lvlPDP.Update(deltaTime, input);
+            //lvlPDP.Update(deltaTime, input);
         }
 
 
@@ -45,14 +45,14 @@ namespace TGC.Group.Model.Escenarios
             sprite.End();
 
             inicio.Render();
-            lvlPDP.Render();
+            //lvlPDP.Render();
         }
 
 
         public void dispose()
         {
             inicio.Dispose();
-            lvlPDP.Dispose();
+           // lvlPDP.Dispose();
         }
 
 
