@@ -69,7 +69,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcScene scene;
 
         private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
-        //     private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
+        //private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
@@ -143,12 +143,11 @@ namespace TGC.Group.Model.Escenarios
             
 
             reproductorMp3.FileName = pathDeLaCancion;
-            //reproductorMp3.play(true);
+            reproductorMp3.play(true);
+
+
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
-
-            Console.WriteLine(plataforma2.Position);
-            Console.WriteLine(plataforma1.Position);  
             cantVidas = 3;
 
            
@@ -162,6 +161,8 @@ namespace TGC.Group.Model.Escenarios
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
 
             //AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
+
+            reproducirMusica(input);
 
             velocidadCaminar = 2;
             if (floorCollider != null)
@@ -286,8 +287,6 @@ namespace TGC.Group.Model.Escenarios
         /// /////////////////////////////////////////////////////////////////////
 
         public void render(float deltaTime){
-
-           // reproducirMusica();
 
             foreach (var mesh in objectsInFront)
             {
@@ -774,4 +773,3 @@ namespace TGC.Group.Model.Escenarios
     }
 
 }
-
