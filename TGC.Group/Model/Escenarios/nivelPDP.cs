@@ -107,8 +107,8 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
-            // personajePrincipal.Position = new TGCVector3(210, 1, 310);
-            personajePrincipal.Position = puerta2;
+            personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            //personajePrincipal.Position = puerta2;
             //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             //personajePrincipal.Position = puerta2;
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
