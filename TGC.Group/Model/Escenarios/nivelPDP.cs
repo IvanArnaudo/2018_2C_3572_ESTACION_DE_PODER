@@ -78,6 +78,9 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 puerta2 = new TGCVector3(1705, 1, 337);
         private TGCVector3 puerta3 = new TGCVector3(3412, 1, 2103);
         private float puertaCruzada = 0;
+        private TgcMesh charcoEstatic1;
+        private TgcMesh charcoEstatic2;
+        private TgcMesh charcoEstatic3;
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -103,7 +106,9 @@ namespace TGC.Group.Model.Escenarios
                                     });
 
             personajePrincipal.playAnimation("Parado", true);
-            personajePrincipal.Position = new TGCVector3(210, 1, 310);
+
+            // personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            personajePrincipal.Position = puerta2;
             //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             //personajePrincipal.Position = puerta2;
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
@@ -123,10 +128,10 @@ namespace TGC.Group.Model.Escenarios
             }
 
             //Añado los charcos de coca a los modificadores de velocidad
-            fastSliders.Add(scene.Meshes[295]);
-            fastSliders.Add(scene.Meshes[296]);
-            fastSliders.Add(scene.Meshes[305]);
-            
+            charcoEstatic1 = scene.Meshes[295].clone("charcoEstatic1");
+            charcoEstatic2 = scene.Meshes[296].clone("charcoEstatic2");
+            charcoEstatic3 = scene.Meshes[305].clone("charcoEstatic3");
+
             charco1 = scene.Meshes[295].Position;
             charco2 = scene.Meshes[296].Position;
             charco3 = scene.Meshes[305].Position;
@@ -139,6 +144,9 @@ namespace TGC.Group.Model.Escenarios
             scene.Meshes[296].BoundingBox.move(charco2);
             scene.Meshes[305].BoundingBox.move(charco3);
 
+            fastSliders.Add(scene.Meshes[295]);
+            fastSliders.Add(scene.Meshes[296]);
+            fastSliders.Add(scene.Meshes[305]);
             //Añado el piso de la cafetería como modificador de la velocidad
             slowSliders.Add(scene.Meshes[270]);
 
@@ -148,11 +156,21 @@ namespace TGC.Group.Model.Escenarios
                 Console.WriteLine(mesh.Name);
             }
 
+
+            foreach (TgcMesh mesh in fastSliders)
+            {
+                Console.WriteLine(mesh.BoundingBox.Position);
+            }
+
             //Añado zonas de muerte
             dangerPlaces.Add(scene.Meshes[14]);
             dangerPlaces.Add(scene.Meshes[19]);
             dangerPlaces.Add(scene.Meshes[34]);
             dangerPlaces.Add(scene.Meshes[46]);
+
+            scene.Meshes.Add(charcoEstatic1);
+            scene.Meshes.Add(charcoEstatic2);
+            scene.Meshes.Add(charcoEstatic3);
 
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
@@ -267,6 +285,10 @@ namespace TGC.Group.Model.Escenarios
                 posVidas -= vida.Width;
             }
 
+            scene.Meshes[295].BoundingBox.Render();
+            scene.Meshes[296].BoundingBox.Render();
+            scene.Meshes[305].BoundingBox.Render();
+
             coleccionablesAdquiridos.cambiarTexto(cantidadColeccionablesAgarrados.ToString());
             coleccionablesAdquiridos.Render();
 
@@ -361,7 +383,7 @@ namespace TGC.Group.Model.Escenarios
                     CruzarPuertas(mesh);
                     Caer(mesh);
 
-                } else if(collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && fastSliders.Contains(mesh)){
+                } else if(collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && fastSliders.Contains(mesh)){                 
                         sliderModifierType = "fast";
                         sliderFloorCollider = mesh;
                         sliderModifier = 2f;
@@ -558,7 +580,9 @@ namespace TGC.Group.Model.Escenarios
                 TGCVector3 colisionCamara;
                 if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
                 {
-                    objectsBehind.Add(mesh);
+                   
+                    objectsBehind.Add(mesh);        
+                   
                 }
                 else
                 {
