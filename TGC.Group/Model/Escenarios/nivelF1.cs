@@ -18,6 +18,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Textures;
 using TGC.Group.Model.Interfaz;
 using Microsoft.DirectX;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -131,7 +132,24 @@ namespace TGC.Group.Model.Escenarios
 
             librosAdquiridos = new Boton(cantidadLibrosAdquiridos.ToString(), 0.925f, 0.88f, null);
 
+            foreach(var mesh in scene.Meshes)
+            {
+                mesh.Effect = TgcShaders.Instance.TgcMeshPointLightShader;
+                mesh.Effect.SetValue("lightColor", ColorValue.FromColor(Color.WhiteSmoke));
+                mesh.Effect.SetValue("lightIntensity", 60);
+                mesh.Effect.SetValue("lightAttenuation", 0.1f);
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(scene.Meshes[223].BoundingBox.Position));
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(scene.Meshes[224].BoundingBox.Position));
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(scene.Meshes[225].BoundingBox.Position));
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(scene.Meshes[226].BoundingBox.Position));
 
+                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.Black));
+                mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.WhiteSmoke));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.WhiteSmoke));
+                mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.WhiteSmoke));
+                mesh.Effect.SetValue("materialSpecularExp", 20);
+            }
 
             plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
             plataforma2 = scene.Meshes[165];
@@ -143,7 +161,7 @@ namespace TGC.Group.Model.Escenarios
             
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+            //reproductorMp3.play(true);
 
 
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
@@ -290,11 +308,13 @@ namespace TGC.Group.Model.Escenarios
 
             foreach (var mesh in objectsInFront)
             {
+                
+
                 if (!librosAgarrados.Contains(mesh))
                 {
-                //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
-                //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
-                        mesh.Render();
+                    //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
+                    //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    mesh.Render();
                 } 
            //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
@@ -480,7 +500,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
-                jumping = 280f;
+                jumping = 380f;
                 //jumping = 400.5f;
                 moving = true;
                 enElPiso = false;
@@ -521,7 +541,7 @@ namespace TGC.Group.Model.Escenarios
                 if (estadoActual == TgcMp3Player.States.Open)
                 {
                     //Reproducir MP3
-                    reproductorMp3.play(true);
+                    //reproductorMp3.play(true);
                 }
                 if (estadoActual == TgcMp3Player.States.Stopped)
                 {
@@ -704,6 +724,7 @@ namespace TGC.Group.Model.Escenarios
                 if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
                 {
                     objectsBehind.Add(mesh);
+                    mesh.Effect = TgcShaders.Instance.TgcMeshShader;
                 }
                 else
                 {
@@ -718,6 +739,9 @@ namespace TGC.Group.Model.Escenarios
                         //Si no dividimos la distancia por 2 se acerca mucho al target.
                         minDistSq = FastMath.Min(distSq * 0.75f, minDistSq);
                     }
+                    mesh.Effect = TgcShaders.Instance.TgcMeshPointLightShader;
+                    //mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(camaraInterna.Position));
+                    mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
                 }
             }
                 //Hay colision del segmento camara-personaje y el objeto
