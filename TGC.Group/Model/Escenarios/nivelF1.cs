@@ -141,7 +141,6 @@ namespace TGC.Group.Model.Escenarios
             plataformasMovibles.Add(plataforma2);
 
             
-
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
 
@@ -150,7 +149,9 @@ namespace TGC.Group.Model.Escenarios
 
             cantVidas = 3;
 
-           
+            Console.WriteLine(scene.Meshes[261].Name);
+            Console.WriteLine(scene.Meshes[202].Name);
+
         }
 
         /// /////////////////////////////////////////////////////////////////////
