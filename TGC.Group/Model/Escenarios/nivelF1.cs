@@ -26,7 +26,8 @@ namespace TGC.Group.Model.Escenarios
         private float velocidadCaminar = 3;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 60f;
-        private float velocidadDesplazamientolibros = 10f;
+        private float velocidadDesplazamientolibros = 50f;
+        private float velocidadDesplazamientoBolasDeCanion = 200f;
         private float sliderModifier = 1;
         private string sliderModifierType = "none";
         List<TgcMesh> slowSliders = new List<TgcMesh>();
@@ -56,15 +57,24 @@ namespace TGC.Group.Model.Escenarios
         
         private TgcMesh plataforma1;
         private TgcMesh plataforma2;
+
         TGCVector3 centroPlataforma1 = new TGCVector3(2520, -195, 585);
         TGCVector3 centroPlataforma2 = new TGCVector3(2520, -195, 305);
+
+        private TgcMesh bolaDeCanion1;
+        private TgcMesh bolaDeCanion2;
+        private TgcMesh bolaDeCanion3;
+
+        TGCVector3 posicionInicialBolaDeCanion1 = new TGCVector3();
+        TGCVector3 posicionInicialBolaDeCanion2 = new TGCVector3();
+        TGCVector3 posicionInicialBolaDeCanion3 = new TGCVector3();
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
 
         private string pathDeLaCancion;
 
         private List<TgcMesh> plataformasMovibles = new List<TgcMesh>();
-
+        private List<TgcMesh> bolasDeCanion = new List<TgcMesh>();
 
         private TgcScene scene;
 
@@ -75,8 +85,11 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
         private const float velocidadDeRotacion = 4f;
-        private float incremento = 0f, rotAngle = 0;
+        private float incremento = 0f, incrementoBola1 = 0f, incrementoBola2 = 0f, incrementoBola3 = 0f, rotAngle = 0f;
         private float distanciaRecorrida = 0f;
+        private float distanciaRecorridaBola1 = 0f;
+        private float distanciaRecorridaBola2 = 0f;
+        private float distanciaRecorridaBola3 = 0f;
         private float cantVidas;
         private Sprite HUD;
         private TgcTexture vida;
@@ -120,8 +133,8 @@ namespace TGC.Group.Model.Escenarios
             //Configurar animacion inicial
             personajePrincipal.playAnimation("Parado", true);
 
-            personajePrincipal.Position = puntoCheckpointActual;
-            //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            //personajePrincipal.Position = puntoCheckpointActual;
+            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
 
@@ -136,11 +149,21 @@ namespace TGC.Group.Model.Escenarios
             plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
             plataforma2 = scene.Meshes[165];
 
-
             plataformasMovibles.Add(plataforma1);
             plataformasMovibles.Add(plataforma2);
 
-            
+            bolaDeCanion1 = scene.Meshes[172];
+            bolaDeCanion2 = scene.Meshes[173];
+            bolaDeCanion3 = scene.Meshes[174];
+
+            posicionInicialBolaDeCanion1 = scene.Meshes[172].Position;
+            posicionInicialBolaDeCanion2 = scene.Meshes[173].Position;
+            posicionInicialBolaDeCanion3 = scene.Meshes[174].Position;
+
+            bolasDeCanion.Add(bolaDeCanion1);
+            bolasDeCanion.Add(bolaDeCanion2);
+            bolasDeCanion.Add(bolaDeCanion3);
+
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
 
@@ -148,9 +171,6 @@ namespace TGC.Group.Model.Escenarios
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
             cantVidas = 3;
-
-            Console.WriteLine(scene.Meshes[261].Name);
-            Console.WriteLine(scene.Meshes[202].Name);
 
         }
 
@@ -193,7 +213,7 @@ namespace TGC.Group.Model.Escenarios
                 direccionDeMovimientoActual *= -1;
             }
 
-            //Animacion de los libros de F1
+            //Animacion de los libros de F1:
 
             foreach (TgcMesh libro in scene.Meshes)
             {
@@ -202,12 +222,43 @@ namespace TGC.Group.Model.Escenarios
                     incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * deltaTime;
                     libro.Move(0, incremento, 0);
                     distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 1250f)
+                    if (Math.Abs(distanciaRecorrida) > 1000f)
                     {
                         direccionDeMovimientoActual *= -1;
+                        distanciaRecorrida = 0f;
                     }
                 }
             }
+
+            //Animacion de las Bolas de cañon:
+
+                   incrementoBola1 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1);
+                   incrementoBola2 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1.5f);
+                   incrementoBola3 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-2);
+
+                   bolaDeCanion1.Move(0, 0, incrementoBola1);
+                   distanciaRecorridaBola1 = distanciaRecorridaBola1 + incrementoBola1;
+                   if (Math.Abs(distanciaRecorridaBola1) > 3000f)
+                   {
+                       bolaDeCanion1.Position = posicionInicialBolaDeCanion1;
+                       distanciaRecorridaBola1 = 0f;
+                   }
+
+                    bolaDeCanion2.Move(0, 0, incrementoBola2);
+                    distanciaRecorridaBola2 = distanciaRecorridaBola2 + incrementoBola2;
+                    if (Math.Abs(distanciaRecorridaBola2) > 3000f)
+                    {
+                        bolaDeCanion2.Position = posicionInicialBolaDeCanion2;
+                        distanciaRecorridaBola2 = 0f;
+                    }
+
+                    bolaDeCanion3.Move(0, 0, incrementoBola3);
+                    distanciaRecorridaBola3 = distanciaRecorridaBola3 + incrementoBola3;
+                    if (Math.Abs(distanciaRecorridaBola3) > 3000f)
+                    {
+                        bolaDeCanion3.Position = posicionInicialBolaDeCanion3;
+                        distanciaRecorridaBola3 = 0f;
+                    }
 
 
             var moveForward = 0f;
@@ -217,7 +268,9 @@ namespace TGC.Group.Model.Escenarios
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
 
-           
+
+
+            ChocarConBolasDeCanion();
 
             if (floorCollider != null && plataformasMovibles.Contains(floorCollider) && floorCollider.BoundingBox.PMax.Y < personajePrincipal.BoundingBox.PMin.Y)
             {
@@ -598,6 +651,34 @@ namespace TGC.Group.Model.Escenarios
             
         }
 
+        private void ChocarConBolasDeCanion()
+        {
+            foreach (var mesh in scene.Meshes)
+            {
+
+                var mainMeshBoundingBox = personajePrincipal.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                if (mainMeshBoundingBox == sceneMeshBoundingBox)
+                    continue;
+
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+                {
+                    if (mesh.Name == "Sphere")
+                    {
+                        if (cantVidas < 1)
+                        {
+                            AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameOver(), camaraInterna);
+                        }
+                        personajePrincipal.Position = puntoCheckpointActual;
+                        cantVidas--;
+                    }
+                }
+            }
+        }
+
         private void verSiSeCompletoNivel(TgcMesh mesh)
         {
 
@@ -620,8 +701,6 @@ namespace TGC.Group.Model.Escenarios
 
         }
 
-
-
         private void AgarrarLibros(TgcMesh mesh)
         {
             if (mesh.Name == "Box_1" && !librosAgarrados.Contains(mesh))
@@ -632,7 +711,6 @@ namespace TGC.Group.Model.Escenarios
                 mesh.Dispose();
             }
         }
-
 
         private void Slider(TGCVector3 lastPos, TGCVector3 movementRay, float dtime)
         {
