@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Camara;
 using TGC.Core.Input;
 
@@ -59,10 +60,10 @@ namespace TGC.Group.Model.Escenarios
             escenarios[escenarioActual].update(deltaTime, input, camara);
         }
 
-        public void render(float deltaTime){
+        public void render(float deltaTime, TgcFrustum frustum){
             if (escenarioActual == -1) return;
 
-            escenarios[escenarioActual].render(deltaTime);
+            escenarios[escenarioActual].render(deltaTime, frustum);
         }
 
         public void dispose(){

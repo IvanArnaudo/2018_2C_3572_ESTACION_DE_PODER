@@ -23,7 +23,7 @@ namespace TGC.Group.Model.Escenarios
     {
 
         private TgcScene scene;
-        private float velocidadCaminar = 5;
+        private float velocidadCaminar;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoColeccionables = 25f;
         private float direccionDeMovimientoActual = 1;
@@ -150,18 +150,6 @@ namespace TGC.Group.Model.Escenarios
             //Añado el piso de la cafetería como modificador de la velocidad
             slowSliders.Add(scene.Meshes[270]);
 
-            Console.WriteLine("SlowSlider");
-            foreach (TgcMesh mesh in slowSliders)
-            {
-                Console.WriteLine(mesh.Name);
-            }
-
-
-            foreach (TgcMesh mesh in fastSliders)
-            {
-                Console.WriteLine(mesh.BoundingBox.Position);
-            }
-
             //Añado zonas de muerte
             dangerPlaces.Add(scene.Meshes[14]);
             dangerPlaces.Add(scene.Meshes[19]);
@@ -185,7 +173,7 @@ namespace TGC.Group.Model.Escenarios
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
 
-            velocidadCaminar = 5;
+            velocidadCaminar = 1000 * deltaTime;
             if (floorCollider != null) lastColliderPos = floorCollider.Position;
 
             var moveForward = 0f;
@@ -196,7 +184,7 @@ namespace TGC.Group.Model.Escenarios
 
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
-            Salto(input);
+            Salto(input, deltaTime);
             AplicarGravedad(deltaTime);
 
             if (rotating) {
@@ -255,7 +243,7 @@ namespace TGC.Group.Model.Escenarios
         /// ////////////////////////////RENDER///////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
 
-        public void render(float deltaTime)
+        public void render(float deltaTime, TgcFrustum frustum)
         {
 
             // reproducirMusica();
@@ -265,8 +253,8 @@ namespace TGC.Group.Model.Escenarios
             {
                 if (!coleccionablesAgarrados.Contains(mesh))
                 {
-                //        var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
-                //        if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
+                    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
                     mesh.Render();
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
@@ -409,11 +397,12 @@ namespace TGC.Group.Model.Escenarios
                 if (Math.Abs(distanciaRecorrida) > 100f)
                 {
                     direccionDeMovimientoActual *= -1;
+                    distanciaRecorrida = 0f;
                 }
             }
         }
 
-        private void Salto(TgcD3dInput input)
+        private void Salto(TgcD3dInput input, float dTime)
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
@@ -427,8 +416,8 @@ namespace TGC.Group.Model.Escenarios
         {
             if (!enElPiso)
             {
-                velocidadCaminar = 1;
-                jumping -= 2.5f * dTime;
+                velocidadCaminar = 750*dTime;
+                jumping -= 4f * dTime;
                 jump = jumping;
                 moving = true;
             }
@@ -543,8 +532,7 @@ namespace TGC.Group.Model.Escenarios
 
             }
         }
-
-        
+                
         private void Coleccionar(TgcMesh mesh)
         {
             if (coleccionables.Contains(mesh)) 

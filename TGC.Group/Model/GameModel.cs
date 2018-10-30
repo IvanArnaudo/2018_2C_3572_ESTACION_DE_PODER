@@ -64,7 +64,7 @@ namespace TGC.Group.Model
 
             PreRender();
 
-            AdministradorDeEscenarios.getSingleton().render(ElapsedTime);
+            AdministradorDeEscenarios.getSingleton().render(ElapsedTime, Frustum);
 
             PostRender();
 

@@ -185,7 +185,7 @@ namespace TGC.Group.Model.Escenarios
 
             reproducirMusica(input);
 
-            velocidadCaminar = 2;
+            velocidadCaminar = 500 * deltaTime;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
 
@@ -340,17 +340,16 @@ namespace TGC.Group.Model.Escenarios
         /// ////////////////////////////RENDER///////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
 
-        public void render(float deltaTime){
+        public void render(float deltaTime, TgcFrustum frustum){
 
             foreach (var mesh in objectsInFront)
             {
                 if (!librosAgarrados.Contains(mesh))
                 {
-                //    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(Frustum, mesh.BoundingBox);
-                //    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
+                    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
                         mesh.Render();
                 } 
-           //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
         
             personajePrincipal.animateAndRender(deltaTime);
@@ -545,7 +544,8 @@ namespace TGC.Group.Model.Escenarios
         {
             if (!enElPiso)
             {
-                jumping -= 2.5f;
+                velocidadCaminar = 750 * dTime;
+                jumping -= 300 * dTime;
                 jump = jumping;
                 moving = true;
             }
@@ -687,7 +687,7 @@ namespace TGC.Group.Model.Escenarios
                 if (cantidadLibrosAdquiridos >= 10)
                 {
                     reproductorMp3.closeFile();
-                    AdministradorDeEscenarios.getSingleton().agregarEscenario(new nivelPDP(), camaraInterna);
+                    AdministradorDeEscenarios.getSingleton().agregarEscenario(new Intermedio(), camaraInterna);
                 } else
                 {
                     personajePrincipal.Position = new TGCVector3(400, 1, 400);                  

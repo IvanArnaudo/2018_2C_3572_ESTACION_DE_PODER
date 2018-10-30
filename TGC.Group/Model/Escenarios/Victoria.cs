@@ -8,7 +8,7 @@ using TGC.Core.Mathematica;
 using System.Drawing;
 using Microsoft.DirectX;
 using TGC.Core.Sound;
-
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -39,7 +39,8 @@ namespace TGC.Group.Model.Escenarios
         }
 
 
-        public void render(float deltaTime){
+        public void render(float deltaTime, TgcFrustum frustum)
+        {
             sprite.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
             var scaling = new TGCVector3((float)vp.Width / victory.Width, (float)vp.Height / victory.Height, 0);
