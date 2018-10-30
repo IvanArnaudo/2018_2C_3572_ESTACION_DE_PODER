@@ -8,20 +8,21 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Reflection;
 using System;
+using TGC.Core.Shaders;
 using TGC.Core.Sound;
 using TGC.Core.Input;
 using TGC.Core.Camara;
-using TGC.Core.BoundingVolumes;
 using TGC.Core.Textures;
 using System.Drawing;
 using Microsoft.DirectX;
 using TGC.Group.Model.Interfaz;
+using TGC.Core.BoundingVolumes;
+using System.IO;
 
 namespace TGC.Group.Model.Escenarios
 {
     class nivelPDP : Escenario
     {
-
         private TgcScene scene;
         private float velocidadCaminar = 5;
         private float velocidadRotacion = 250;
@@ -30,6 +31,8 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
+
+        private List<LightData> luces;
 
         private float jumping;
         float jump = 0;
@@ -82,6 +85,12 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic2;
         private TgcMesh charcoEstatic3;
 
+        private LightData luz1 = new LightData();
+        private LightData luz2 = new LightData();
+        private LightData luz3 = new LightData();
+
+        Microsoft.DirectX.Direct3D.Effect efectoLuz = TgcShaders.Instance.TgcMeshPointLightShader;
+
 
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
@@ -91,9 +100,42 @@ namespace TGC.Group.Model.Escenarios
         {
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-
-            scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml");
+            var parser = new TgcSceneParser();
+            var scenePath = MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml";
+           // scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml");
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
+
+            var sceneData = parser.parseSceneFromString(File.ReadAllText(scenePath));
+
+            //Separar modelos reales de las luces, segun layer "Lights"
+            luces = new List<LightData>();
+            var realMeshData = new List<TgcMeshData>();
+            for (var i = 0; i < sceneData.meshesData.Length; i++)
+            {
+                var meshData = sceneData.meshesData[i];
+
+                //Es una luz, no cargar mesh, solo importan sus datos
+                if (meshData.layerName == "Lights")
+                {
+                    //Guardar datos de luz
+                    var light = new LightData();
+                    light.color = Color.FromArgb((int)meshData.color[0], (int)meshData.color[1], (int)meshData.color[2]);
+                    light.aabb = new TgcBoundingAxisAlignBox(TGCVector3.Float3ArrayToVector3(meshData.pMin), TGCVector3.Float3ArrayToVector3(meshData.pMax));
+                    light.pos = light.aabb.calculateBoxCenter();
+                    luces.Add(light);
+                }
+                //Es un mesh real, agregar a array definitivo
+                else
+                {
+                    realMeshData.Add(meshData);
+                }
+            }
+
+            //Reemplazar array original de meshData de sceneData por el definitivo
+            sceneData.meshesData = realMeshData.ToArray();
+
+            scene = loader.loadScene(sceneData, MediaDir + "ParadigmasEscena\\");
+
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -107,11 +149,15 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
-            personajePrincipal.Position = new TGCVector3(210, 1, 310);
-            //personajePrincipal.Position = puerta2;
+            //personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            personajePrincipal.Position = puerta2;
             //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             //personajePrincipal.Position = puerta2;
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
+
+            //for(var i = 318; i<320; i++) { 
+            //Console.WriteLine(scene.Meshes[i].Name);
+            //}
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
@@ -150,18 +196,6 @@ namespace TGC.Group.Model.Escenarios
             //Añado el piso de la cafetería como modificador de la velocidad
             slowSliders.Add(scene.Meshes[270]);
 
-            Console.WriteLine("SlowSlider");
-            foreach (TgcMesh mesh in slowSliders)
-            {
-                Console.WriteLine(mesh.Name);
-            }
-
-
-            foreach (TgcMesh mesh in fastSliders)
-            {
-                Console.WriteLine(mesh.BoundingBox.Position);
-            }
-
             //Añado zonas de muerte
             dangerPlaces.Add(scene.Meshes[14]);
             dangerPlaces.Add(scene.Meshes[19]);
@@ -173,8 +207,28 @@ namespace TGC.Group.Model.Escenarios
             scene.Meshes.Add(charcoEstatic3);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+            //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
+
+            foreach (var mesh in scene.Meshes)
+            {
+                
+                var light = getClosestLight(mesh.BoundingBox.calculateBoxCenter());
+
+                //Cargar variables shader de la luz
+                mesh.Effect.SetValue("lightColor", ColorValue.FromColor(light.color));
+                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(light.pos));
+                mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(camara.Position));
+                mesh.Effect.SetValue("lightIntensity", true);
+                mesh.Effect.SetValue("lightAttenuation", true);
+
+                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromArgb(12));
+                mesh.Effect.SetValue("materialAmbientColor", ColorValue.FromArgb(12));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromArgb(12));
+                mesh.Effect.SetValue("materialSpecularColor", ColorValue.FromArgb(12));
+                mesh.Effect.SetValue("materialSpecularExp", true);
+            }
 
         }
 
@@ -271,6 +325,7 @@ namespace TGC.Group.Model.Escenarios
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
+
 
             personajePrincipal.animateAndRender(deltaTime);
 
@@ -580,9 +635,8 @@ namespace TGC.Group.Model.Escenarios
                 TGCVector3 colisionCamara;
                 if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
                 {
-                   
-                    objectsBehind.Add(mesh);        
-                   
+                    objectsBehind.Add(mesh);
+                    mesh.Effect = TgcShaders.Instance.TgcMeshShader;
                 }
                 else
                 {
@@ -597,6 +651,8 @@ namespace TGC.Group.Model.Escenarios
                         //Si no dividimos la distancia por 2 se acerca mucho al target.
                         minDistSq = FastMath.Min(distSq * 0.75f, minDistSq);
                     }
+                    mesh.Effect = efectoLuz;
+                    mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
                 }
             }
             //Hay colision del segmento camara-personaje y el objeto
@@ -685,6 +741,51 @@ namespace TGC.Group.Model.Escenarios
                 sliderModifier = 1;
         }
 
+        private void SetearLuces(){
+
+            luces = new List<LightData>();
+
+            luz1.color = Color.Blue;
+            luz2.color = Color.Crimson;
+            luz3.color = Color.DarkGreen;
+
+            luz1.aabb = scene.Meshes[288].BoundingBox;
+            luz2.aabb = scene.Meshes[289].BoundingBox;
+            luz3.aabb = scene.Meshes[290].BoundingBox;
+
+            luz1.pos = luz1.aabb.calculateBoxCenter();
+            luz2.pos = luz2.aabb.calculateBoxCenter();
+            luz3.pos = luz3.aabb.calculateBoxCenter();
+
+            luces.Add(luz1);
+            luces.Add(luz2);
+            luces.Add(luz3);
+        }
+
+        public class LightData
+        {
+            public TgcBoundingAxisAlignBox aabb;
+            public Color color;
+            public TGCVector3 pos;
+        }
+
+        private LightData getClosestLight(TGCVector3 pos)
+        {
+            var minDist = float.MaxValue;
+            LightData minLight = null;
+
+            foreach (var light in luces)
+            {
+                var distSq = TGCVector3.LengthSq(pos - light.pos);
+                if (distSq < minDist)
+                {
+                    minDist = distSq;
+                    minLight = light;
+                }
+            }
+
+            return minLight;
+        }
 
     }
 
