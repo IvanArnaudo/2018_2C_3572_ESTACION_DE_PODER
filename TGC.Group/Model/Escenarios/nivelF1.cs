@@ -8,16 +8,15 @@ using System.Collections.Generic;
 using TGC.Core.Collision;
 using System.Reflection;
 using System;
-using TGC.Core.Example;
 using TGC.Core.Sound;
 using TGC.Core.Input;
 using TGC.Core.Camara;
 using TGC.Core.BoundingVolumes;
 using System.Drawing;
-using TGC.Core.Geometry;
 using TGC.Core.Textures;
 using TGC.Group.Model.Interfaz;
 using Microsoft.DirectX;
+using TGC.Core.Particle;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -69,6 +68,10 @@ namespace TGC.Group.Model.Escenarios
         TGCVector3 posicionInicialBolaDeCanion2 = new TGCVector3();
         TGCVector3 posicionInicialBolaDeCanion3 = new TGCVector3();
 
+        TGCVector3 posicionInicialEmisorDeParticulas1 = new TGCVector3();
+        TGCVector3 posicionInicialEmisorDeParticulas2 = new TGCVector3();
+        TGCVector3 posicionInicialEmisorDeParticulas3 = new TGCVector3();
+
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
 
         private string pathDeLaCancion;
@@ -98,6 +101,12 @@ namespace TGC.Group.Model.Escenarios
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
         private int posVidas;
 
+        private ParticleEmitter emisorDeParticulas1;
+        private ParticleEmitter emisorDeParticulas2;
+        private ParticleEmitter emisorDeParticulas3;
+        private int cantidadDeParticulas;
+        private string pathTexturaEmisorDeParticulas;
+
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -108,12 +117,14 @@ namespace TGC.Group.Model.Escenarios
             
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+            D3DDevice.Instance.ParticlesEnabled = true;
+            D3DDevice.Instance.EnableParticles();
+
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
+            meshesDeLaEscena = new List<TgcMesh>();
 
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
-
-            meshesDeLaEscena = new List<TgcMesh>();
 
             HUD = new Sprite(D3DDevice.Instance.Device);
             vida = TgcTexture.createTexture(MediaDir + "Textures\\vida.png");
@@ -164,6 +175,41 @@ namespace TGC.Group.Model.Escenarios
             bolasDeCanion.Add(bolaDeCanion2);
             bolasDeCanion.Add(bolaDeCanion3);
 
+            pathTexturaEmisorDeParticulas = MediaDir + "Textures\\fuego.png";
+            cantidadDeParticulas = 10;
+
+            emisorDeParticulas1 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
+            emisorDeParticulas1.MinSizeParticle = 10f;
+            emisorDeParticulas1.MaxSizeParticle = 10f;
+            emisorDeParticulas1.ParticleTimeToLive = 1f;
+            emisorDeParticulas1.CreationFrecuency = 0.25f;
+            emisorDeParticulas1.Dispersion = 50;
+            emisorDeParticulas1.Speed = new TGCVector3 (-25, 40, 50);
+            posicionInicialEmisorDeParticulas1 = new TGCVector3(2205, 200, 4345);
+            emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
+
+            emisorDeParticulas2 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
+            emisorDeParticulas2 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
+            emisorDeParticulas2.MinSizeParticle = 10f;
+            emisorDeParticulas2.MaxSizeParticle = 10f;
+            emisorDeParticulas2.ParticleTimeToLive = 1f;
+            emisorDeParticulas2.CreationFrecuency = 0.25f;
+            emisorDeParticulas2.Dispersion = 50;
+            emisorDeParticulas2.Speed = new TGCVector3(-25, 40, 50);
+
+            //emisorDeParticulas2.Position = bolaDeCanion2.Position;
+
+            emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
+            emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
+            emisorDeParticulas3.MinSizeParticle = 10f;
+            emisorDeParticulas3.MaxSizeParticle = 10f;
+            emisorDeParticulas3.ParticleTimeToLive = 1f;
+            emisorDeParticulas3.CreationFrecuency = 0.25f;
+            emisorDeParticulas3.Dispersion = 50;
+            emisorDeParticulas3.Speed = new TGCVector3(-25, 40, 50);
+
+            //emisorDeParticulas3.Position = bolaDeCanion3.Position;
+
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
 
@@ -181,31 +227,19 @@ namespace TGC.Group.Model.Escenarios
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
 
-            //AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
-
             reproducirMusica(input);
 
-            velocidadCaminar = 500 * deltaTime;
+            velocidadCaminar = 350 * deltaTime;
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
 
             // Animacion de las plataformas
-            var anguloRotacionPlataforma = Geometry.DegreeToRadian(velocidadDeRotacion * deltaTime);
 
-            //  plataforma1.RotateY(anguloRotacionPlataforma);
-                plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
+            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
                 if (FastMath.Abs(plataforma1.Position.Y) > 360f)
                 {
                     direccionDeMovimientoActual *= -1;
                 }
-/*
-            var Traslacion = TGCMatrix.Translation(0, 3f, 0);
-            var Rotacion = TGCMatrix.RotationY(anguloRotacionPlataforma);
-                  
-            var matriz = Rotacion * Traslacion;
-            plataforma1.Transform = matriz;
-
-                        */
             
             plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
             if (FastMath.Abs(plataforma2.Position.Y) > 360f)
@@ -237,10 +271,12 @@ namespace TGC.Group.Model.Escenarios
                    incrementoBola3 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-2);
 
                    bolaDeCanion1.Move(0, 0, incrementoBola1);
+                   //emisorDeParticulas1.Position = new TGCVector3(emisorDeParticulas1.Position.X,emisorDeParticulas1.Position.Y,emisorDeParticulas1.Position.Z + incrementoBola1);
                    distanciaRecorridaBola1 = distanciaRecorridaBola1 + incrementoBola1;
                    if (Math.Abs(distanciaRecorridaBola1) > 3000f)
                    {
                        bolaDeCanion1.Position = posicionInicialBolaDeCanion1;
+                       //emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
                        distanciaRecorridaBola1 = 0f;
                    }
 
@@ -261,14 +297,18 @@ namespace TGC.Group.Model.Escenarios
                     }
 
 
+            //Animacion de los emisores de Particulas:
+
+            emisorDeParticulas1.Position = bolaDeCanion1.Position;
+            emisorDeParticulas2.Position = bolaDeCanion2.Position;
+            emisorDeParticulas3.Position = bolaDeCanion3.Position;
+
+
             var moveForward = 0f;
             float rotate = 0;
             moving = false;
-
             moveForward = MovimientoAbajo(input) - MovimientoArriba(input);
             rotate = RotacionDerecha(input) - RotacionIzquierda(input);
-
-
 
             ChocarConBolasDeCanion();
 
@@ -300,7 +340,8 @@ namespace TGC.Group.Model.Escenarios
             if (moving)
             {
                 //Activar animacion de caminando
-                personajePrincipal.playAnimation("Caminando", true);
+
+                personajePrincipal.playAnimation("Caminando", true); 
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
@@ -369,9 +410,11 @@ namespace TGC.Group.Model.Escenarios
             librosAdquiridos.Render();
 
             HUD.Draw2D(fisicaLib.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
-
-
             HUD.End();
+
+            emisorDeParticulas1.render(deltaTime);
+            emisorDeParticulas2.render(deltaTime);
+            emisorDeParticulas3.render(deltaTime);
         }
 
 
@@ -393,6 +436,10 @@ namespace TGC.Group.Model.Escenarios
             //scene.DisposeAll(); //Dispose de la escena.
 
             reproductorMp3.closeFile();
+
+            emisorDeParticulas1.dispose();
+            emisorDeParticulas2.dispose();
+            emisorDeParticulas3.dispose();
         }
 
         /////////////////////////////////////////////////////////////////////////
@@ -511,7 +558,6 @@ namespace TGC.Group.Model.Escenarios
                     MoverObjetos(mesh, movementRay);
                     CaerseAlAgua(mesh,movementRay);
                     verSiSeCompletoNivel(mesh);
-                    personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
                 if (lastCollide == false && floorCollider != null)
@@ -534,7 +580,6 @@ namespace TGC.Group.Model.Escenarios
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
                 jumping = 280f;
-                //jumping = 400.5f;
                 moving = true;
                 enElPiso = false;
             }
@@ -618,17 +663,17 @@ namespace TGC.Group.Model.Escenarios
         {
             if (mesh.Name == "CajaMadera" && mesh.BoundingBox.PMax.Y >= personajePrincipal.BoundingBox.PMax.Y)
             {
+                personajePrincipal.playAnimation("Empujar", true);
+
                 var lastCajaPos = mesh.Position;
                 if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
                 {
-                    personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
                 else
                  if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
                 {
-                    personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
