@@ -24,7 +24,7 @@ namespace TGC.Group.Model.Escenarios
 
         private float velocidadCaminar = 3;
         private float velocidadRotacion = 250;
-        private float velocidadDesplazamientoPlataformas = 60f;
+        private float velocidadDesplazamientoPlataformas = 100f;
         private float velocidadDesplazamientolibros = 50f;
         private float velocidadDesplazamientoBolasDeCanion = 200f;
         private float sliderModifier = 1;
@@ -32,7 +32,10 @@ namespace TGC.Group.Model.Escenarios
         List<TgcMesh> slowSliders = new List<TgcMesh>();
         List<TgcMesh> fastSliders = new List<TgcMesh>();
 
-        private float direccionDeMovimientoActual=1;
+        private float direccionDeMovimientoActualLibrosF1 = 1;
+        private float direccionDeMovimientoActualPlataforma1 = 1;
+        private float direccionDeMovimientoActualPlataforma2 = 1;
+
         private TgcSkeletalMesh personajePrincipal;
         private TgcThirdPersonCamera camaraInterna;
         private List<TgcMesh> meshesDeLaEscena;
@@ -47,7 +50,6 @@ namespace TGC.Group.Model.Escenarios
         private float cantidadLibrosAdquiridos;
         float jump = 0;
         private bool techo = false;
-   //     private TGCMatrix movimientoPlataforma;
         private TgcMesh collider;
         private TgcMesh floorCollider, ceilingCollider, sliderFloorCollider;
         private TGCMatrix escalaBase;
@@ -87,7 +89,6 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
 
-        private const float velocidadDeRotacion = 4f;
         private float incremento = 0f, incrementoBola1 = 0f, incrementoBola2 = 0f, incrementoBola3 = 0f, rotAngle = 0f;
         private float distanciaRecorrida = 0f;
         private float distanciaRecorridaBola1 = 0f;
@@ -107,15 +108,13 @@ namespace TGC.Group.Model.Escenarios
         private int cantidadDeParticulas;
         private string pathTexturaEmisorDeParticulas;
 
-        /// /////////////////////////////////////////////////////////////////////
-        /// ////////////////////////////INIT/////////////////////////////////////
-        /// /////////////////////////////////////////////////////////////////////
-
+        /////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////INIT/////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
         public void init(string MediaDir, string shaderDir, TgcCamera camara)
         {
             
-            //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
@@ -141,23 +140,19 @@ namespace TGC.Group.Model.Escenarios
                         MediaDir + "Robot\\Parado-TgcSkeletalAnim.xml",
                         MediaDir + "Robot\\Empujar-TgcSkeletalAnim.xml",
                     });
-            //Configurar animacion inicial
+
             personajePrincipal.playAnimation("Parado", true);
 
             //personajePrincipal.Position = puntoCheckpointActual;
             personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
-
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
-            // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
             librosAdquiridos = new Boton(cantidadLibrosAdquiridos.ToString(), 0.925f, 0.88f, null);
 
-
-
-            plataforma1 = scene.Meshes[164]; //serían la 165 y 166 pero arranca desde 0
+            plataforma1 = scene.Meshes[164];
             plataforma2 = scene.Meshes[165];
 
             plataformasMovibles.Add(plataforma1);
@@ -185,7 +180,7 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas1.CreationFrecuency = 0.25f;
             emisorDeParticulas1.Dispersion = 50;
             emisorDeParticulas1.Speed = new TGCVector3 (-25, 40, 50);
-            posicionInicialEmisorDeParticulas1 = new TGCVector3(2205, 200, 4345);
+            posicionInicialEmisorDeParticulas1 = new TGCVector3(1935, 200, 4345);
             emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
 
             emisorDeParticulas2 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
@@ -196,8 +191,8 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas2.CreationFrecuency = 0.25f;
             emisorDeParticulas2.Dispersion = 50;
             emisorDeParticulas2.Speed = new TGCVector3(-25, 40, 50);
-
-            //emisorDeParticulas2.Position = bolaDeCanion2.Position;
+            posicionInicialEmisorDeParticulas2 = new TGCVector3(2205, 200, 4345);
+            emisorDeParticulas2.Position = posicionInicialEmisorDeParticulas2;
 
             emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
             emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
@@ -207,23 +202,20 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas3.CreationFrecuency = 0.25f;
             emisorDeParticulas3.Dispersion = 50;
             emisorDeParticulas3.Speed = new TGCVector3(-25, 40, 50);
-
-            //emisorDeParticulas3.Position = bolaDeCanion3.Position;
+            posicionInicialEmisorDeParticulas3 = new TGCVector3(2495, 200, 4345);
+            emisorDeParticulas3.Position = posicionInicialEmisorDeParticulas3;
 
             reproductorMp3.FileName = pathDeLaCancion;
             reproductorMp3.play(true);
 
-
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
             cantVidas = 3;
-
         }
 
-        /// /////////////////////////////////////////////////////////////////////
-        /// ////////////////////////////UPDATE///////////////////////////////////
-        /// /////////////////////////////////////////////////////////////////////
-
+        /////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////UPDATE///////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara){
 
@@ -233,76 +225,9 @@ namespace TGC.Group.Model.Escenarios
             if (floorCollider != null)
                 lastColliderPos = floorCollider.Position;
 
-            // Animacion de las plataformas
-
-            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActual * deltaTime, 0);
-                if (FastMath.Abs(plataforma1.Position.Y) > 360f)
-                {
-                    direccionDeMovimientoActual *= -1;
-                }
-            
-            plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActual) * deltaTime, 0);
-            if (FastMath.Abs(plataforma2.Position.Y) > 360f)
-            {
-                direccionDeMovimientoActual *= -1;
-            }
-
-            //Animacion de los libros de F1:
-
-            foreach (TgcMesh libro in scene.Meshes)
-            {
-                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
-                {
-                    incremento = velocidadDesplazamientolibros * direccionDeMovimientoActual * deltaTime;
-                    libro.Move(0, incremento, 0);
-                    distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 1000f)
-                    {
-                        direccionDeMovimientoActual *= -1;
-                        distanciaRecorrida = 0f;
-                    }
-                }
-            }
-
-            //Animacion de las Bolas de cañon:
-
-                   incrementoBola1 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1);
-                   incrementoBola2 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1.5f);
-                   incrementoBola3 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-2);
-
-                   bolaDeCanion1.Move(0, 0, incrementoBola1);
-                   //emisorDeParticulas1.Position = new TGCVector3(emisorDeParticulas1.Position.X,emisorDeParticulas1.Position.Y,emisorDeParticulas1.Position.Z + incrementoBola1);
-                   distanciaRecorridaBola1 = distanciaRecorridaBola1 + incrementoBola1;
-                   if (Math.Abs(distanciaRecorridaBola1) > 3000f)
-                   {
-                       bolaDeCanion1.Position = posicionInicialBolaDeCanion1;
-                       //emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
-                       distanciaRecorridaBola1 = 0f;
-                   }
-
-                    bolaDeCanion2.Move(0, 0, incrementoBola2);
-                    distanciaRecorridaBola2 = distanciaRecorridaBola2 + incrementoBola2;
-                    if (Math.Abs(distanciaRecorridaBola2) > 3000f)
-                    {
-                        bolaDeCanion2.Position = posicionInicialBolaDeCanion2;
-                        distanciaRecorridaBola2 = 0f;
-                    }
-
-                    bolaDeCanion3.Move(0, 0, incrementoBola3);
-                    distanciaRecorridaBola3 = distanciaRecorridaBola3 + incrementoBola3;
-                    if (Math.Abs(distanciaRecorridaBola3) > 3000f)
-                    {
-                        bolaDeCanion3.Position = posicionInicialBolaDeCanion3;
-                        distanciaRecorridaBola3 = 0f;
-                    }
-
-
-            //Animacion de los emisores de Particulas:
-
-            emisorDeParticulas1.Position = bolaDeCanion1.Position;
-            emisorDeParticulas2.Position = bolaDeCanion2.Position;
-            emisorDeParticulas3.Position = bolaDeCanion3.Position;
-
+            animarLibrosF1(deltaTime);
+            animarPlataformas(deltaTime);
+            animarBolasDeCanionYEmisoresDeParticulas(deltaTime);
 
             var moveForward = 0f;
             float rotate = 0;
@@ -321,11 +246,8 @@ namespace TGC.Group.Model.Escenarios
             Salto(input);
             AplicarGravedad(deltaTime);
 
-
-            //Si hubo rotacion
             if (rotating)
             {
-                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
                 rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
                 camaraInterna.rotateY(rotAngle);
@@ -333,30 +255,24 @@ namespace TGC.Group.Model.Escenarios
             }
 
             var Movimiento = TGCVector3.Empty;
-            //Si hubo desplazamiento
             float scale = 1;
+
             if (!enElPiso)
                 scale = 0.7f;
             if (moving)
             {
-                //Activar animacion de caminando
-
                 personajePrincipal.playAnimation("Caminando", true); 
 
-                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
                 var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
                 var pmaxPersonaje = personajePrincipal.BoundingBox.PMax.Y;
 
-                //velocidadCaminar = 5;
                 Movimiento = new TGCVector3(FastMath.Sin(personajePrincipal.Rotation.Y) * moveForward, 0, FastMath.Cos(personajePrincipal.Rotation.Y) * moveForward);
                 Movimiento.Scale(scale * sliderModifier);
                 Movimiento.Y = jump * deltaTime;
                 personajePrincipal.Move(Movimiento);
                 
                 DetectarColisiones(lastPos, pminPersonaje, pmaxPersonaje, deltaTime);
-                
-
             }
             else
             {
@@ -372,10 +288,7 @@ namespace TGC.Group.Model.Escenarios
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
             personajePrincipal.Transform = escalaBase;
-
-
         }
-
 
         /////////////////////////////////////////////////////////////////////////
         /// ////////////////////////////RENDER///////////////////////////////////
@@ -417,7 +330,6 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas3.render(deltaTime);
         }
 
-
         /////////////////////////////////////////////////////////////////////////
         /// ////////////////////////////DISPOSE//////////////////////////////////
         /// /////////////////////////////////////////////////////////////////////
@@ -443,8 +355,8 @@ namespace TGC.Group.Model.Escenarios
         }
 
         /////////////////////////////////////////////////////////////////////////
-        /// ////////////////////////////MISC/////////////////////////////////////
-        /// /////////////////////////////////////////////////////////////////////
+        ////////////////////////////////MISC/////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
         private bool DistanciaAlPisoSalto()
         {
@@ -484,7 +396,7 @@ namespace TGC.Group.Model.Escenarios
             var mainMeshBoundingBox = personajePrincipal.BoundingBox;
             var colisionCheckp = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint1);
             var colisionCheckp2 = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint2);
-            //El checkpoint 1 fue atravesado
+
             if (colisionCheckp != TgcCollisionUtils.BoxBoxResult.Afuera)
             {
                 puntoCheckpointActual = puntoCheckpoint1;
@@ -494,8 +406,6 @@ namespace TGC.Group.Model.Escenarios
             }
         }
 
-
-
         private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje, float dtime)
         {
             var lastCollide = false;
@@ -504,18 +414,14 @@ namespace TGC.Group.Model.Escenarios
             foreach (var mesh in scene.Meshes)
             {
 
-                //Los dos BoundingBox que vamos a testear
                 var mainMeshBoundingBox = personajePrincipal.BoundingBox;
                 var sceneMeshBoundingBox = mesh.BoundingBox;
 
                 if (mainMeshBoundingBox == sceneMeshBoundingBox)
                     continue;
 
-                //Ejecutar algoritmo de detección de colisiones
                 var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
 
-
-                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                 if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
                 {
                     if (sceneMeshBoundingBox.PMax.Y <= pminYAnteriorPersonaje + 10)
@@ -549,12 +455,8 @@ namespace TGC.Group.Model.Escenarios
                     collider = mesh;
 
                     var movementRay = lastPos - personajePrincipal.Position;
-                    //Luego debemos clasificar sobre que plano estamos chocando y la direccion de movimiento
-                    //Para todos los casos podemos deducir que la normal del plano cancela el movimiento en dicho plano.
-                    //Esto quiere decir que podemos cancelar el movimiento en el plano y movernos en el otros.
 
                     Slider(lastPos, movementRay, dtime);
-               //     EstablecerCheckpoint();
                     MoverObjetos(mesh, movementRay);
                     CaerseAlAgua(mesh,movementRay);
                     verSiSeCompletoNivel(mesh);
@@ -569,11 +471,8 @@ namespace TGC.Group.Model.Escenarios
                 }
                 else if (floorCollider == null)
                     enElPiso = false;
-
             }
-
         }
-
 
         private void Salto(TgcD3dInput input)
         {
@@ -597,40 +496,42 @@ namespace TGC.Group.Model.Escenarios
             else
                 jump = 0;
         }
+
         private float RotacionIzquierda(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Left) || Input.keyDown(Key.A), "Rotacion");
         }
+
         private float RotacionDerecha(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Right) || Input.keyDown(Key.D), "Rotacion");
         }
+
         private float MovimientoAbajo(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Down) || Input.keyDown(Key.S), "Caminar");
         }
+
         private float MovimientoArriba(TgcD3dInput Input)
         {
             return Movimiento(Input.keyDown(Key.Up) || Input.keyDown(Key.W), "Caminar");
         }
+
         private void reproducirMusica(TgcD3dInput Input){
             var estadoActual = reproductorMp3.getStatus();
             if (Input.keyPressed(Key.M))
             {
                 if (estadoActual == TgcMp3Player.States.Open)
                 {
-                    //Reproducir MP3
                     reproductorMp3.play(true);
                 }
                 if (estadoActual == TgcMp3Player.States.Stopped)
                 {
-                    //Parar y reproducir MP3
                     reproductorMp3.closeFile();
                     reproductorMp3.play(true);
                 }
                 if (estadoActual == TgcMp3Player.States.Playing)
                 {
-                    //Parar el MP3
                     reproductorMp3.stop();
                 }
             }
@@ -656,8 +557,6 @@ namespace TGC.Group.Model.Escenarios
         {
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
-
-
 
         private void MoverObjetos(TgcMesh mesh, TGCVector3 movementRay)
         {
@@ -692,8 +591,7 @@ namespace TGC.Group.Model.Escenarios
                 personajePrincipal.Position = puntoCheckpointActual;
                 cantVidas--;
             
-            }
-            
+            }            
         }
 
         private void ChocarConBolasDeCanion()
@@ -735,15 +633,9 @@ namespace TGC.Group.Model.Escenarios
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new Intermedio(), camaraInterna);
                 } else
                 {
-                    personajePrincipal.Position = new TGCVector3(400, 1, 400);                  
-                    /*
-                    Boton reset = new Boton("Necesitas mas libros para poder pasar la cursada, encontralos!", 2f,2f, null);
-                    reset.Render();
-                    */
-                }
-              
+                    personajePrincipal.Position = new TGCVector3(400, 1, 400);
+                }             
             }
-
         }
 
         private void AgarrarLibros(TgcMesh mesh)
@@ -775,8 +667,6 @@ namespace TGC.Group.Model.Escenarios
                 {
                     rs = new TGCVector3(0, movementRay.Y, movementRay.Z);
                 }
-
-                //Seria ideal sacar el punto mas proximo al bounding que colisiona y chequear con eso, en ves que con la posicion.
             }
             else
             {
@@ -836,18 +726,12 @@ namespace TGC.Group.Model.Escenarios
                         continue;
                     if (TgcCollisionUtils.intersectSegmentAABB(target, position, mesh.BoundingBox, out q))
                     {
-                        //Si hay colision, guardar la que tenga menor distancia
                         float distSq = TGCVector3.Subtract(q, target).LengthSq();
-                        //Hay dos casos singulares, puede que tengamos mas de una colision hay que quedarse con el menor offset.
-                        //Si no dividimos la distancia por 2 se acerca mucho al target.
                         minDistSq = FastMath.Min(distSq * 0.75f, minDistSq);
                     }
                 }
             }
-                //Hay colision del segmento camara-personaje y el objeto
-            
 
-            //Acercar la camara hasta la minima distancia de colision encontrada (pero ponemos un umbral maximo de cercania)
             float newOffsetForward = -FastMath.Sqrt(minDistSq);
 
             if (FastMath.Abs(newOffsetForward) < 10)
@@ -855,8 +739,6 @@ namespace TGC.Group.Model.Escenarios
                 newOffsetForward = 10;
             }
             camaraInterna.OffsetForward = -newOffsetForward;
-
-            //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
             camaraInterna.CalculatePositionTarget(out position, out target);
             camaraInterna.SetCamera(position, target);
         }
@@ -881,21 +763,74 @@ namespace TGC.Group.Model.Escenarios
                 sliderModifier = 1;
         }
 
-        /*private void cargarCancion(string direccionDeArchivo)
+        private void animarBolasDeCanionYEmisoresDeParticulas(float deltaTime)
         {
-            if (archivoActual == null || archivoActual != direccionDeArchivo)
+            incrementoBola1 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1);
+            incrementoBola2 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-1.5f);
+            incrementoBola3 = velocidadDesplazamientoBolasDeCanion * deltaTime * (-2);
+
+            bolaDeCanion1.Move(0, 0, incrementoBola1);
+            emisorDeParticulas1.Position = new TGCVector3(emisorDeParticulas1.Position.X, emisorDeParticulas1.Position.Y, emisorDeParticulas1.Position.Z + incrementoBola1);
+            distanciaRecorridaBola1 = distanciaRecorridaBola1 + incrementoBola1;
+            if (Math.Abs(distanciaRecorridaBola1) > 3000f)
             {
-                archivoActual = direccionDeArchivo;                                     Esto es para cargar a otra cancion en el transcurso del juego, lo dejo aca por si interesa en un futuro.
-
-                //Cargar archivo de la cancion
-                reproductorMp3.closeFile();
-                reproductorMp3.FileName = archivoActual;
+                bolaDeCanion1.Position = posicionInicialBolaDeCanion1;
+                emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
+                distanciaRecorridaBola1 = 0f;
             }
-        }*/
 
+            bolaDeCanion2.Move(0, 0, incrementoBola2);
+            emisorDeParticulas2.Position = new TGCVector3(emisorDeParticulas2.Position.X, emisorDeParticulas2.Position.Y, emisorDeParticulas2.Position.Z + incrementoBola2);
+            distanciaRecorridaBola2 = distanciaRecorridaBola2 + incrementoBola2;
+            if (Math.Abs(distanciaRecorridaBola2) > 3000f)
+            {
+                bolaDeCanion2.Position = posicionInicialBolaDeCanion2;
+                emisorDeParticulas2.Position = posicionInicialEmisorDeParticulas2;
+                distanciaRecorridaBola2 = 0f;
+            }
 
+            bolaDeCanion3.Move(0, 0, incrementoBola3);
+            emisorDeParticulas3.Position = new TGCVector3(emisorDeParticulas3.Position.X, emisorDeParticulas3.Position.Y, emisorDeParticulas3.Position.Z + incrementoBola3);
+            distanciaRecorridaBola3 = distanciaRecorridaBola3 + incrementoBola3;
+            if (Math.Abs(distanciaRecorridaBola3) > 3000f)
+            {
+                bolaDeCanion3.Position = posicionInicialBolaDeCanion3;
+                emisorDeParticulas3.Position = posicionInicialEmisorDeParticulas3;
+                distanciaRecorridaBola3 = 0f;
+            }
+        }
 
+        private void animarLibrosF1(float deltaTime)
+        {
+            foreach (TgcMesh libro in scene.Meshes)
+            {
+                if (libro.Name == "Box_1" && !librosAgarrados.Contains(libro))
+                {
+                    incremento = velocidadDesplazamientolibros * direccionDeMovimientoActualLibrosF1 * deltaTime;
+                    libro.Move(0, incremento, 0);
+                    distanciaRecorrida = distanciaRecorrida + incremento;
+                    if (Math.Abs(distanciaRecorrida) > 1000f)
+                    {
+                        direccionDeMovimientoActualLibrosF1 *= -1;
+                        distanciaRecorrida = 0f;
+                    }
+                }                  
+            }
+        }
 
+        private void animarPlataformas(float deltaTime)
+        {
+            plataforma1.Move(0, velocidadDesplazamientoPlataformas * direccionDeMovimientoActualPlataforma1 * deltaTime, 0);
+            if (FastMath.Abs(plataforma1.Position.Y) > 300f)
+            {
+                direccionDeMovimientoActualPlataforma1 *= -1;
+            }
+
+            plataforma2.Move(0, velocidadDesplazamientoPlataformas * (-direccionDeMovimientoActualPlataforma2) * deltaTime, 0);
+            if (FastMath.Abs(plataforma2.Position.Y) > 300f)
+            {
+                direccionDeMovimientoActualPlataforma2 *= -1;
+            }
+        }
     }
-
 }
