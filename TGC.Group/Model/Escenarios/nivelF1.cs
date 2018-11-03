@@ -143,8 +143,8 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
-            //personajePrincipal.Position = puntoCheckpointActual;
-            personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            personajePrincipal.Position = puntoCheckpointActual;
+            //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -174,33 +174,33 @@ namespace TGC.Group.Model.Escenarios
             cantidadDeParticulas = 10;
 
             emisorDeParticulas1 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
-            emisorDeParticulas1.MinSizeParticle = 10f;
-            emisorDeParticulas1.MaxSizeParticle = 10f;
+            emisorDeParticulas1.MinSizeParticle = 30f;
+            emisorDeParticulas1.MaxSizeParticle = 30f;
             emisorDeParticulas1.ParticleTimeToLive = 1f;
             emisorDeParticulas1.CreationFrecuency = 0.25f;
-            emisorDeParticulas1.Dispersion = 50;
+            emisorDeParticulas1.Dispersion = 500;
             emisorDeParticulas1.Speed = new TGCVector3 (-25, 40, 50);
             posicionInicialEmisorDeParticulas1 = new TGCVector3(1935, 200, 4345);
             emisorDeParticulas1.Position = posicionInicialEmisorDeParticulas1;
 
             emisorDeParticulas2 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
             emisorDeParticulas2 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
-            emisorDeParticulas2.MinSizeParticle = 10f;
-            emisorDeParticulas2.MaxSizeParticle = 10f;
+            emisorDeParticulas2.MinSizeParticle = 30f;
+            emisorDeParticulas2.MaxSizeParticle = 30f;
             emisorDeParticulas2.ParticleTimeToLive = 1f;
             emisorDeParticulas2.CreationFrecuency = 0.25f;
-            emisorDeParticulas2.Dispersion = 50;
+            emisorDeParticulas2.Dispersion = 500;
             emisorDeParticulas2.Speed = new TGCVector3(-25, 40, 50);
             posicionInicialEmisorDeParticulas2 = new TGCVector3(2205, 200, 4345);
             emisorDeParticulas2.Position = posicionInicialEmisorDeParticulas2;
 
             emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
             emisorDeParticulas3 = new ParticleEmitter(pathTexturaEmisorDeParticulas, cantidadDeParticulas);
-            emisorDeParticulas3.MinSizeParticle = 10f;
-            emisorDeParticulas3.MaxSizeParticle = 10f;
+            emisorDeParticulas3.MinSizeParticle = 30f;
+            emisorDeParticulas3.MaxSizeParticle = 30f;
             emisorDeParticulas3.ParticleTimeToLive = 1f;
             emisorDeParticulas3.CreationFrecuency = 0.25f;
-            emisorDeParticulas3.Dispersion = 50;
+            emisorDeParticulas3.Dispersion = 500;
             emisorDeParticulas3.Speed = new TGCVector3(-25, 40, 50);
             posicionInicialEmisorDeParticulas3 = new TGCVector3(2495, 200, 4345);
             emisorDeParticulas3.Position = posicionInicialEmisorDeParticulas3;
@@ -279,11 +279,9 @@ namespace TGC.Group.Model.Escenarios
                 personajePrincipal.playAnimation("Parado", true);
             }
 
-            //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = personajePrincipal.Position;
-
-            
             ajustarPosicionDeCamara();
+
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
@@ -291,8 +289,8 @@ namespace TGC.Group.Model.Escenarios
         }
 
         /////////////////////////////////////////////////////////////////////////
-        /// ////////////////////////////RENDER///////////////////////////////////
-        /// /////////////////////////////////////////////////////////////////////
+        ////////////////////////////////RENDER///////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
         public void render(float deltaTime, TgcFrustum frustum){
 
@@ -331,8 +329,8 @@ namespace TGC.Group.Model.Escenarios
         }
 
         /////////////////////////////////////////////////////////////////////////
-        /// ////////////////////////////DISPOSE//////////////////////////////////
-        /// /////////////////////////////////////////////////////////////////////
+        ////////////////////////////////DISPOSE//////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
         public void dispose()
         {
@@ -344,9 +342,8 @@ namespace TGC.Group.Model.Escenarios
                     mesh.Dispose();
                 }
             }
-            personajePrincipal.Dispose(); //Dispose del personaje.
-            //scene.DisposeAll(); //Dispose de la escena.
-
+            personajePrincipal.Dispose();
+  
             reproductorMp3.closeFile();
 
             emisorDeParticulas1.dispose();
@@ -355,7 +352,7 @@ namespace TGC.Group.Model.Escenarios
         }
 
         /////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////MISC/////////////////////////////////////
+        ////////////////////////////////FUNCIONES////////////////////////////////
         /////////////////////////////////////////////////////////////////////////
 
         private bool DistanciaAlPisoSalto()
@@ -651,8 +648,8 @@ namespace TGC.Group.Model.Escenarios
 
         private void Slider(TGCVector3 lastPos, TGCVector3 movementRay, float dtime)
         {
-
             var rs = TGCVector3.Empty;
+
             if (((personajePrincipal.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
                 (personajePrincipal.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0)) &&
                 ((personajePrincipal.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
