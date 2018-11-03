@@ -82,8 +82,9 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
+ 
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
-        private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
+        private TGCVector3 puntoCheckpoint2 = new TGCVector3(1129 , -567, 155);
         private List<TgcMesh> lights = new List<TgcMesh>();
 
         private const float velocidadDeRotacion = 4f;
@@ -729,7 +730,7 @@ namespace TGC.Group.Model.Escenarios
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new Intermedio(), camaraInterna);
                 } else
                 {
-                    personajePrincipal.Position = new TGCVector3(400, 1, 400);                  
+                    personajePrincipal.Position = new TGCVector3(652, 13, 9815);                  
                     /*
                     Boton reset = new Boton("Necesitas mas libros para poder pasar la cursada, encontralos!", 2f,2f, null);
                     reset.Render();
