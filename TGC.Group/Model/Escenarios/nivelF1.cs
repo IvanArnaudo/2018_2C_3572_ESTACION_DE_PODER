@@ -17,6 +17,7 @@ using TGC.Core.Textures;
 using TGC.Group.Model.Interfaz;
 using Microsoft.DirectX;
 using TGC.Core.Particle;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -88,6 +89,7 @@ namespace TGC.Group.Model.Escenarios
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1250, -590, 7900);
+        private List<TgcMesh> lights = new List<TgcMesh>();
 
         private float incremento = 0f, incrementoBola1 = 0f, incrementoBola2 = 0f, incrementoBola3 = 0f, rotAngle = 0f;
         private float distanciaRecorrida = 0f;
@@ -101,6 +103,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(839, 591, 4969), new TGCVector3(23, 395, 5120));
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
         private int posVidas;
+        private Microsoft.DirectX.Direct3D.Effect effect;
 
         private ParticleEmitter emisorDeParticulas1;
         private ParticleEmitter emisorDeParticulas2;
@@ -143,8 +146,11 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
+
             personajePrincipal.Position = puntoCheckpointActual;
             //personajePrincipal.Position = new TGCVector3(2400, 1, 1400);
+            //personajePrincipal.Position = new TGCVector3(400, 1, 400);
+
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -211,6 +217,24 @@ namespace TGC.Group.Model.Escenarios
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
             cantVidas = 3;
+
+            effect = TgcShaders.loadEffect(shaderDir + "MultiDiffuseLights.fx");
+
+            for (var i = 223; i < 250; ++i)
+            {
+                lights.Add(scene.Meshes[i]);
+            }
+                
+            scene.Meshes[4].D3dMesh.ComputeNormals();
+            scene.Meshes[48].D3dMesh.ComputeNormals();
+
+            foreach (var mesh in scene.Meshes)
+            {
+                if (mesh.Name.Contains("Box_") || mesh.Name.Contains("Madera") || mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North"))
+                {
+                    mesh.D3dMesh.ComputeNormals();
+                }
+            }
         }
 
         /////////////////////////////////////////////////////////////////////////
@@ -294,8 +318,33 @@ namespace TGC.Group.Model.Escenarios
 
         public void render(float deltaTime, TgcFrustum frustum){
 
+            var lightColors = new ColorValue[lights.Count];
+            var pointLightPositions = new Vector4[lights.Count];
+            var pointLightIntensity = new float[lights.Count];
+            var pointLightAttenuation = new float[lights.Count];
+            for (var i = 0; i < lights.Count; i++)
+            {
+                var lightMesh = lights[i];
+
+                lightColors[i] = ColorValue.FromColor(Color.WhiteSmoke);
+                pointLightPositions[i] = TGCVector3.Vector3ToVector4(lightMesh.BoundingBox.Position);
+                if (i > 13)
+                    pointLightIntensity[i] = 40;
+                else
+                    pointLightIntensity[i] = 25;
+                pointLightAttenuation[i] = 0.07f;
+            }
             foreach (var mesh in objectsInFront)
             {
+                mesh.Effect = effect;
+
+                mesh.Effect.SetValue("lightColor", lightColors);
+                mesh.Effect.SetValue("lightPosition", pointLightPositions);
+                mesh.Effect.SetValue("lightIntensity", pointLightIntensity);
+                mesh.Effect.SetValue("lightAttenuation", pointLightAttenuation);
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.Black));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.WhiteSmoke));
+                mesh.Technique = "MultiDiffuseLightsTechnique";
                 if (!librosAgarrados.Contains(mesh))
                 {
                     var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
@@ -337,6 +386,9 @@ namespace TGC.Group.Model.Escenarios
 
             foreach (TgcMesh mesh in scene.Meshes)
             {
+
+                //Cargar variables de shader
+                
                 if (!librosAgarrados.Contains(mesh))
                 {
                     mesh.Dispose();
@@ -758,6 +810,22 @@ namespace TGC.Group.Model.Escenarios
         {
             if (floorCollider == null || sliderFloorCollider == null || floorCollider != sliderFloorCollider)
                 sliderModifier = 1;
+        }
+        private TGCVector3 getClosestLight(TGCVector3 pos)
+        {
+            var minDist = float.MaxValue;
+            TgcMesh minLight = null;
+
+            foreach (var light in lights)
+            {
+                var distSq = TGCVector3.LengthSq(pos - light.BoundingBox.calculateBoxCenter());
+                if (distSq < minDist)
+                {
+                    minDist = distSq;
+                    minLight = light;
+                }
+            }
+            return minLight.BoundingBox.calculateBoxCenter();
         }
 
         private void animarBolasDeCanionYEmisoresDeParticulas(float deltaTime)
