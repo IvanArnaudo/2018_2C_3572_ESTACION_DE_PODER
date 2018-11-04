@@ -176,14 +176,43 @@ namespace TGC.Group.Model.Escenarios
 
             cantVidas = 3;
             effect = TgcShaders.loadEffect(shaderDir + "MultiDiffuseLights.fx");
-            for (var i = 223; i < 250; ++i)
+            for (var i = 224; i < 250; ++i)
                 lights.Add(scene.Meshes[i]);
 
             scene.Meshes[4].D3dMesh.ComputeNormals();
             scene.Meshes[48].D3dMesh.ComputeNormals();
+            var lightColors = new ColorValue[lights.Count];
+            var pointLightPositions = new Vector4[lights.Count];
+            var pointLightIntensity = new float[lights.Count];
+            var pointLightAttenuation = new float[lights.Count];
+            for (var i = 0; i < lights.Count; i++)
+            {
+                var lightMesh = lights[i];
+
+                lightColors[i] = ColorValue.FromColor(Color.White);
+                pointLightPositions[i] = TGCVector3.Vector3ToVector4(lightMesh.BoundingBox.Position);
+                pointLightIntensity[i] = 20;
+                pointLightAttenuation[i] = 0.07f;
+            }
             foreach (var mesh in scene.Meshes)
-                if (mesh.Name.Contains("Box_") || mesh.Name.Contains("Madera") || mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North"))
+            {
+                if (mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North") || mesh.Name.Contains("West"))
+                    continue;
+                mesh.Effect = effect;
+
+                mesh.Effect.SetValue("lightColor", lightColors);
+                mesh.Effect.SetValue("lightPosition", pointLightPositions);
+                mesh.Effect.SetValue("lightIntensity", pointLightIntensity);
+                mesh.Effect.SetValue("lightAttenuation", pointLightAttenuation);
+                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.Black));
+                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                mesh.Technique = "MultiDiffuseLightsTechnique";
+                if (mesh.Name.Contains("Box") || mesh.Name.Contains("Madera") )
+                {
+                    mesh.Effect.SetValue("lightAttenuation", pointLightAttenuation);
                     mesh.D3dMesh.ComputeNormals();
+                }
+            }
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -354,33 +383,10 @@ namespace TGC.Group.Model.Escenarios
 
         public void render(float deltaTime, TgcFrustum frustum){
 
-            var lightColors = new ColorValue[lights.Count];
-            var pointLightPositions = new Vector4[lights.Count];
-            var pointLightIntensity = new float[lights.Count];
-            var pointLightAttenuation = new float[lights.Count];
-            for (var i = 0; i < lights.Count; i++)
-            {
-                var lightMesh = lights[i];
-
-                lightColors[i] = ColorValue.FromColor(Color.WhiteSmoke);
-                pointLightPositions[i] = TGCVector3.Vector3ToVector4(lightMesh.BoundingBox.Position);
-                if (i > 13)
-                    pointLightIntensity[i] = 40;
-                else
-                    pointLightIntensity[i] = 25;
-                pointLightAttenuation[i] = 0.07f;
-            }
+            
             foreach (var mesh in objectsInFront)
             {
-                mesh.Effect = effect;
-
-                mesh.Effect.SetValue("lightColor", lightColors);
-                mesh.Effect.SetValue("lightPosition", pointLightPositions);
-                mesh.Effect.SetValue("lightIntensity", pointLightIntensity);
-                mesh.Effect.SetValue("lightAttenuation", pointLightAttenuation);
-                mesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.Black));
-                mesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.WhiteSmoke));
-                mesh.Technique = "MultiDiffuseLightsTechnique";
+               
                 if (!librosAgarrados.Contains(mesh))
                 {
                     var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
