@@ -36,7 +36,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcScene scene;
+        //private TgcScene scene;
 
         public override void Init(){
             var menu = new Menu();
