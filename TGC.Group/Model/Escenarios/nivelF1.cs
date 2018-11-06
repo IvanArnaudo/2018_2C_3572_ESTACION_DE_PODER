@@ -23,6 +23,9 @@ namespace TGC.Group.Model.Escenarios
 {
     class nivelF1:Escenario{
 
+        private float resolucionX;
+        private float resolucionY;
+
         private float velocidadCaminar = 3;
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 100f;
@@ -32,6 +35,11 @@ namespace TGC.Group.Model.Escenarios
         private string sliderModifierType = "none";
         List<TgcMesh> slowSliders = new List<TgcMesh>();
         List<TgcMesh> fastSliders = new List<TgcMesh>();
+        List<TgcMesh> aguas = new List<TgcMesh>();
+
+
+        private float tiempoOlas;
+        private float signo = 1;
 
         private float direccionDeMovimientoActualLibrosF1 = 1;
         private float direccionDeMovimientoActualPlataforma1 = 1;
@@ -84,9 +92,9 @@ namespace TGC.Group.Model.Escenarios
 
         private TgcScene scene;
 
-        //private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
+        private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
         //private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
-        private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
+        //private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
 
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1129, -567, 155);
@@ -105,6 +113,8 @@ namespace TGC.Group.Model.Escenarios
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
         private int posVidas;
         private Microsoft.DirectX.Direct3D.Effect effect;
+        private Microsoft.DirectX.Direct3D.Effect efectoOlas;
+
 
         private ParticleEmitter emisorDeParticulas1;
         private ParticleEmitter emisorDeParticulas2;
@@ -120,13 +130,19 @@ namespace TGC.Group.Model.Escenarios
         public void init(string MediaDir, string shaderDir, TgcCamera camara)
         {
             var d3dDevice = D3DDevice.Instance.Device;
+            resolucionX = d3dDevice.PresentationParameters.BackBufferWidth;
+            resolucionY = d3dDevice.PresentationParameters.BackBufferHeight;
+
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
 
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "NivelFisica1\\EscenaSceneEditorFisica1-TgcScene.xml");
 
+            SetearAguas();
+
             pathDeLaCancion = MediaDir + "Musica\\FeverTime.mp3";
+
 
             meshesDeLaEscena = new List<TgcMesh>();
 
@@ -255,6 +271,9 @@ namespace TGC.Group.Model.Escenarios
                     mesh.D3dMesh.ComputeNormals();
                 }
             }
+
+            AplicarShaders(shaderDir);
+
         }
 
         /////////////////////////////////////////////////////////////////////////
@@ -272,6 +291,11 @@ namespace TGC.Group.Model.Escenarios
             {
                 lastColliderPos = floorCollider.Position;
             }
+
+            if (Math.Abs(tiempoOlas) > 5) cambiarSigno();
+
+            if (signo < 0) tiempoOlas -= deltaTime;
+            if (signo > 0) tiempoOlas += deltaTime;
 
             animarLibrosF1(deltaTime);
             animarPlataformas(deltaTime);
@@ -360,7 +384,9 @@ namespace TGC.Group.Model.Escenarios
                         mesh.Render();
                 } 
             }
-        
+
+            efectoOlas.SetValue("time", tiempoOlas);
+
             personajePrincipal.animateAndRender(deltaTime);
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
@@ -917,6 +943,35 @@ namespace TGC.Group.Model.Escenarios
             {
                 direccionDeMovimientoActualPlataforma2 *= -1;
             }
+        }
+        private void AplicarShaders(String shaderDir)
+        {
+            efectoOlas = TgcShaders.loadEffect(shaderDir + "ShaderOlas.fx");
+
+            foreach (TgcMesh mesh in aguas)
+            {
+                mesh.Effect = efectoOlas;
+                mesh.Technique = "Olas";
+            }
+            efectoOlas.SetValue("screen_dx", resolucionX);
+            efectoOlas.SetValue("screen_dy", resolucionY);
+        }
+
+        private void cambiarSigno()
+        {
+            signo *= -1;
+        }
+
+        //11, 21, 26, 30, 34, 42, 57
+        private void SetearAguas()
+        {
+            aguas.Add(scene.Meshes[11]);
+            aguas.Add(scene.Meshes[21]);
+            aguas.Add(scene.Meshes[26]);
+            aguas.Add(scene.Meshes[30]);
+            aguas.Add(scene.Meshes[34]);
+            aguas.Add(scene.Meshes[42]);
+            aguas.Add(scene.Meshes[57]);
         }
     }
 }

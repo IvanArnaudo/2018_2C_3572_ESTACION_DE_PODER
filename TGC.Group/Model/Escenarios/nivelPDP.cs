@@ -171,6 +171,7 @@ namespace TGC.Group.Model.Escenarios
 
             if (activarTeleport)
             {
+                velocidadCaminar = 0;
                 Console.WriteLine(Math.Sin(tiempoTeleport));
                 tiempoTeleport += deltaTime;
                 if (Math.Sin(tiempoTeleport) > 0.999)
@@ -186,7 +187,7 @@ namespace TGC.Group.Model.Escenarios
                     activarTeleport = false;
                 }
             }
-                if (Math.Abs(tiempoOlas) > 5) cambiarSigno(); 
+            if (Math.Abs(tiempoOlas) > 5) cambiarSigno(); 
 
             if (signo < 0) tiempoOlas -= deltaTime;
             if (signo > 0) tiempoOlas += deltaTime;

@@ -61,7 +61,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
     return (Output);
 }
 
-float frecuencia = 5;
+float frecuencia = 8;
 float factorY = 10;
 float factorX = -10;
 
