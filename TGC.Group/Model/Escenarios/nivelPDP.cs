@@ -16,11 +16,18 @@ using TGC.Core.Textures;
 using System.Drawing;
 using Microsoft.DirectX;
 using TGC.Group.Model.Interfaz;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.Escenarios
 {
     class nivelPDP : Escenario
     {
+
+        private float resolucionX;
+        private float resolucionY;
+
+        private float tiempoAcumulado;
+        private float signo = 1;
 
         private TgcScene scene;
         private float velocidadCaminar;
@@ -64,6 +71,7 @@ namespace TGC.Group.Model.Escenarios
         private float cantidadColeccionablesAgarrados = 0;
 
         private List<TgcMesh> dangerPlaces = new List<TgcMesh>();
+        private List<TgcMesh> lavas = new List<TgcMesh>();
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
         private string pathDeLaCancion;
@@ -82,6 +90,8 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic2;
         private TgcMesh charcoEstatic3;
 
+        private Microsoft.DirectX.Direct3D.Effect efectoLava;
+
 
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
@@ -90,6 +100,9 @@ namespace TGC.Group.Model.Escenarios
         public void init(string MediaDir, string shaderDir, TgcCamera camara)
         {
             var d3dDevice = D3DDevice.Instance.Device;
+            resolucionX = d3dDevice.PresentationParameters.BackBufferWidth;
+            resolucionY = d3dDevice.PresentationParameters.BackBufferHeight;
+
             var loader = new TgcSceneLoader();
 
             scene = loader.loadSceneFromFile(MediaDir + "ParadigmasEscena\\nivelParadigmas-TgcScene.xml");
@@ -107,10 +120,9 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
-            personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            //personajePrincipal.Position = new TGCVector3(210, 1, 310);
             //personajePrincipal.Position = puerta2;
-            //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
-            //personajePrincipal.Position = puerta2;
+            personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -122,46 +134,16 @@ namespace TGC.Group.Model.Escenarios
 
             coleccionablesAdquiridos = new Boton(cantidadColeccionablesAgarrados.ToString(), 0.925f, 0.88f, null);
 
-            //Declaro a los mumukis como coleccionables
-            for (var i = 285; i <= 293; i++) {
-                coleccionables.Add(scene.Meshes[i]);
-            }
+            SetearListas();
+            AplicarShaders(shaderDir);
 
-            //Añado los charcos de coca a los modificadores de velocidad
-            charcoEstatic1 = scene.Meshes[295].clone("charcoEstatic1");
-            charcoEstatic2 = scene.Meshes[296].clone("charcoEstatic2");
-            charcoEstatic3 = scene.Meshes[305].clone("charcoEstatic3");
-
-            charco1 = scene.Meshes[295].Position;
-            charco2 = scene.Meshes[296].Position;
-            charco3 = scene.Meshes[305].Position;
-
-            charco1.Y = charco1.Y + 30;
-            charco2.Y = charco2.Y + 30;
-            charco3.Y = charco3.Y + 30;
-
-            scene.Meshes[295].BoundingBox.move(charco1);
-            scene.Meshes[296].BoundingBox.move(charco2);
-            scene.Meshes[305].BoundingBox.move(charco3);
-
-            fastSliders.Add(scene.Meshes[295]);
-            fastSliders.Add(scene.Meshes[296]);
-            fastSliders.Add(scene.Meshes[305]);
-            //Añado el piso de la cafetería como modificador de la velocidad
-            slowSliders.Add(scene.Meshes[270]);
-
-            //Añado zonas de muerte
-            dangerPlaces.Add(scene.Meshes[14]);
-            dangerPlaces.Add(scene.Meshes[19]);
-            dangerPlaces.Add(scene.Meshes[34]);
-            dangerPlaces.Add(scene.Meshes[46]);
 
             scene.Meshes.Add(charcoEstatic1);
             scene.Meshes.Add(charcoEstatic2);
             scene.Meshes.Add(charcoEstatic3);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+            //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -171,14 +153,21 @@ namespace TGC.Group.Model.Escenarios
         /// /////////////////////////////////////////////////////////////////////
 
 
-        public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
+        public void update(float deltaTime, TgcD3dInput input, TgcCamera camara)
+        {
+            //velocidadCaminar = 1000 * deltaTime;
+            velocidadCaminar = 5;
 
-            velocidadCaminar = 1000 * deltaTime;
             if (floorCollider != null) lastColliderPos = floorCollider.Position;
 
             var moveForward = 0f;
             float rotate = 0;
             moving = false;
+
+            if (Math.Abs(tiempoAcumulado) > 5) cambiarSigno(); 
+
+            if (signo < 0) tiempoAcumulado -= deltaTime;
+            if (signo > 0) tiempoAcumulado += deltaTime;
 
             MoverColeccionables(deltaTime);
 
@@ -187,7 +176,8 @@ namespace TGC.Group.Model.Escenarios
             Salto(input, deltaTime);
             AplicarGravedad(deltaTime);
 
-            if (rotating) {
+            if (rotating)
+            {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
                 rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
@@ -227,8 +217,8 @@ namespace TGC.Group.Model.Escenarios
 
             ajustarPosicionDeCamara();
 
-           // if (puertaCruzada == 3) moverPlatafoma(deltaTime);
-            
+            // if (puertaCruzada == 3) moverPlatafoma(deltaTime);
+
 
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
@@ -237,7 +227,7 @@ namespace TGC.Group.Model.Escenarios
 
         }
 
-     
+
 
         /////////////////////////////////////////////////////////////////////////
         /// ////////////////////////////RENDER///////////////////////////////////
@@ -248,19 +238,22 @@ namespace TGC.Group.Model.Escenarios
 
             // reproducirMusica();
 
-
             foreach (var mesh in objectsInFront)
             {
                 if (!coleccionablesAgarrados.Contains(mesh))
                 {
-                    var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
-                    if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
+                    // var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
+                    // if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
                     mesh.Render();
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
             personajePrincipal.animateAndRender(deltaTime);
+
+            //if (tiempoAcumulado > 10) tiempoAcumulado -=1;
+            efectoLava.SetValue("time", tiempoAcumulado);
+
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
@@ -371,10 +364,12 @@ namespace TGC.Group.Model.Escenarios
                     CruzarPuertas(mesh);
                     Caer(mesh);
 
-                } else if(collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && fastSliders.Contains(mesh)){                 
-                        sliderModifierType = "fast";
-                        sliderFloorCollider = mesh;
-                        sliderModifier = 2f;
+                }
+                else if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera && fastSliders.Contains(mesh))
+                {
+                    sliderModifierType = "fast";
+                    sliderFloorCollider = mesh;
+                    sliderModifier = 2f;
                 }
                 if (lastCollide == false)
                 {
@@ -385,7 +380,6 @@ namespace TGC.Group.Model.Escenarios
             }
 
         }
-
 
         private void MoverColeccionables(float deltaTime)
         {
@@ -416,8 +410,8 @@ namespace TGC.Group.Model.Escenarios
         {
             if (!enElPiso)
             {
-                velocidadCaminar = 750*dTime;
-                jumping -= 4f * dTime;
+                velocidadCaminar = 1;
+                jumping -= 2.5f * dTime;
                 jump = jumping;
                 moving = true;
             }
@@ -490,14 +484,17 @@ namespace TGC.Group.Model.Escenarios
             return (float)this.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(this, null);
         }
 
-        private void Caer(TgcMesh mesh){
+        private void Caer(TgcMesh mesh)
+        {
             if (dangerPlaces.Contains(mesh))
             {
-                if (vidasRestantes > 1) { 
+                if (vidasRestantes > 1)
+                {
                     vidasRestantes--;
                     personajePrincipal.Position = ultimoCP;
                 }
-                else{
+                else
+                {
                     AdministradorDeEscenarios.getSingleton().agregarEscenario(new GameOver(), camaraInterna);
                 }
             }
@@ -505,19 +502,23 @@ namespace TGC.Group.Model.Escenarios
 
         private void CruzarPuertas(TgcMesh mesh)
         {
-            if (mesh.Name.Contains("Puerta")){
-                if (puertaCruzada == 0){
+            if (mesh.Name.Contains("Puerta"))
+            {
+                if (puertaCruzada == 0)
+                {
                     personajePrincipal.Position = puerta1;
                     ultimoCP = puerta1;
                     puertaCruzada++;
                     return;
                 }
-                if (puertaCruzada == 1 && cantidadColeccionablesAgarrados == 3){
+                if (puertaCruzada == 1 && cantidadColeccionablesAgarrados == 3)
+                {
                     personajePrincipal.Position = puerta2;
                     puertaCruzada++;
                     return;
                 }
-                if (puertaCruzada == 2 && cantidadColeccionablesAgarrados == 6){
+                if (puertaCruzada == 2 && cantidadColeccionablesAgarrados == 6)
+                {
                     personajePrincipal.Position = puerta3;
                     ultimoCP = new TGCVector3(2715, 1, 2635);
                     puertaCruzada++;
@@ -532,10 +533,10 @@ namespace TGC.Group.Model.Escenarios
 
             }
         }
-                
+
         private void Coleccionar(TgcMesh mesh)
         {
-            if (coleccionables.Contains(mesh)) 
+            if (coleccionables.Contains(mesh))
             {
                 coleccionablesAgarrados.Add(mesh);
                 coleccionables.Remove(mesh);
@@ -568,9 +569,9 @@ namespace TGC.Group.Model.Escenarios
                 TGCVector3 colisionCamara;
                 if (TgcCollisionUtils.intersectSegmentAABB(camaraInterna.Position, camaraInterna.Target, mesh.BoundingBox, out colisionCamara)) //ACA ESTAMOS GUARDANDO EN UNA LISTA TODOS LOS OBJETOS QUE SE CHOCAN CON LA CAMARA POR DETRAS Y POR ADELANTE.
                 {
-                   
-                    objectsBehind.Add(mesh);        
-                   
+
+                    objectsBehind.Add(mesh);
+
                 }
                 else
                 {
@@ -674,6 +675,59 @@ namespace TGC.Group.Model.Escenarios
         }
 
 
-    }
+        private void SetearListas()
+        {
+            //Declaro a los mumukis como coleccionables
+            for (var i = 285; i <= 293; i++)
+            {
+                coleccionables.Add(scene.Meshes[i]);
+            }
 
+            //Añado los charcos de coca a los modificadores de velocidad
+            charcoEstatic1 = scene.Meshes[295].clone("charcoEstatic1");
+            charcoEstatic2 = scene.Meshes[296].clone("charcoEstatic2");
+            charcoEstatic3 = scene.Meshes[305].clone("charcoEstatic3");
+
+            charco1 = scene.Meshes[295].Position;
+            charco2 = scene.Meshes[296].Position;
+            charco3 = scene.Meshes[305].Position;
+
+            charco1.Y = charco1.Y + 30;
+            charco2.Y = charco2.Y + 30;
+            charco3.Y = charco3.Y + 30;
+
+            scene.Meshes[295].BoundingBox.move(charco1);
+            scene.Meshes[296].BoundingBox.move(charco2);
+            scene.Meshes[305].BoundingBox.move(charco3);
+
+            fastSliders.Add(scene.Meshes[295]);
+            fastSliders.Add(scene.Meshes[296]);
+            fastSliders.Add(scene.Meshes[305]);
+            //Añado el piso de la cafetería como modificador de la velocidad
+            slowSliders.Add(scene.Meshes[270]);
+
+            //Añado zonas de muerte
+            dangerPlaces.Add(scene.Meshes[14]);
+            dangerPlaces.Add(scene.Meshes[19]);
+            dangerPlaces.Add(scene.Meshes[34]);
+            dangerPlaces.Add(scene.Meshes[46]);
+            lavas.Add(scene.Meshes[34]);
+            lavas.Add(scene.Meshes[46]);
+        }
+
+        private void AplicarShaders(String shaderDir){
+            efectoLava = TgcShaders.loadEffect(shaderDir + "ShaderLava.fx");
+            foreach (TgcMesh mesh in lavas)
+            {
+                mesh.Effect = efectoLava;
+                mesh.Technique = "Olas";
+            }
+            efectoLava.SetValue("screen_dx", resolucionX);
+            efectoLava.SetValue("screen_dy", resolucionY);
+        }
+
+        private void cambiarSigno(){
+            signo *= -1;
+        }
+    }
 }

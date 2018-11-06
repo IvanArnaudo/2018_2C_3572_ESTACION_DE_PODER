@@ -41,10 +41,10 @@ float3 materialEmissiveColor; //Color RGB
 float3 materialDiffuseColor; //Color RGB
 
 //Variables de las 4 luces
-float3 lightColor[27]; //Color RGB de las 4 luces
-float4 lightPosition[27]; //Posicion de las 4 luces
-float lightIntensity[27]; //Intensidad de las 4 luces
-float lightAttenuation[27]; //Factor de atenuacion de las 4 luces
+float3 lightColor[26]; //Color RGB de las 4 luces
+float4 lightPosition[26]; //Posicion de las 4 luces
+float lightIntensity[26]; //Intensidad de las 4 luces
+float lightAttenuation[26]; //Factor de atenuacion de las 4 luces
 
 /**************************************************************************************/
 /* MultiDiffuseLightsTechnique */
@@ -120,7 +120,7 @@ float4 point_light_ps(PS_INPUT input) : COLOR0
     float3 diffuseLighting = materialEmissiveColor;
 
 	//Diffuse 0
-	for(int j = 0; j < 11; j++)
+	for(int j = 0; j < 26; j++)
 	{
     	diffuseLighting += computeDiffuseComponent(input.WorldPosition, Nn, j);
 	}
