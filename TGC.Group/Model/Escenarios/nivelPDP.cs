@@ -16,6 +16,8 @@ using TGC.Core.Textures;
 using System.Drawing;
 using Microsoft.DirectX;
 using TGC.Group.Model.Interfaz;
+using TGC.Core.Shaders;
+using Effect = Microsoft.DirectX.Direct3D.Effect;
 
 namespace TGC.Group.Model.Escenarios
 {
@@ -81,6 +83,8 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic1;
         private TgcMesh charcoEstatic2;
         private TgcMesh charcoEstatic3;
+        private Effect effect;
+        private float effetTime = 0;
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -161,9 +165,11 @@ namespace TGC.Group.Model.Escenarios
             scene.Meshes.Add(charcoEstatic3);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            reproductorMp3.play(true);
+            //reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
+            effect = TgcShaders.loadEffect(shaderDir + "RobotRoomChange.fx");
+            
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -172,6 +178,7 @@ namespace TGC.Group.Model.Escenarios
 
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
+
 
             velocidadCaminar = 1000 * deltaTime;
             if (floorCollider != null) lastColliderPos = floorCollider.Position;
@@ -248,7 +255,6 @@ namespace TGC.Group.Model.Escenarios
 
             // reproducirMusica();
 
-
             foreach (var mesh in objectsInFront)
             {
                 if (!coleccionablesAgarrados.Contains(mesh))
@@ -259,7 +265,10 @@ namespace TGC.Group.Model.Escenarios
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
-
+            personajePrincipal.Effect = effect;
+            effetTime += deltaTime;
+            effect.SetValue("time", effetTime);
+            personajePrincipal.Technique = "RenderScene";
             personajePrincipal.animateAndRender(deltaTime);
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
@@ -284,7 +293,6 @@ namespace TGC.Group.Model.Escenarios
 
 
             HUD.End();
-
 
         }
 
