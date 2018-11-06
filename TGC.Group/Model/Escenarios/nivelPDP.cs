@@ -26,8 +26,10 @@ namespace TGC.Group.Model.Escenarios
         private float resolucionX;
         private float resolucionY;
 
-        private float tiempoAcumulado;
+        private float tiempoOlas;
+        private float tiempoTeleport;
         private float signo = 1;
+        private bool activarTeleport = false;
 
         private TgcScene scene;
         private float velocidadCaminar;
@@ -91,6 +93,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic3;
 
         private Microsoft.DirectX.Direct3D.Effect efectoLava;
+        private Microsoft.DirectX.Direct3D.Effect efectoTeleport;
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -120,9 +123,9 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.playAnimation("Parado", true);
 
-            //personajePrincipal.Position = new TGCVector3(210, 1, 310);
+            personajePrincipal.Position = new TGCVector3(210, 1, 310);
             //personajePrincipal.Position = puerta2;
-            personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
+            //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -164,10 +167,16 @@ namespace TGC.Group.Model.Escenarios
             float rotate = 0;
             moving = false;
 
-            if (Math.Abs(tiempoAcumulado) > 5) cambiarSigno(); 
+            if (activarTeleport) {
+                Console.WriteLine(Math.Sin(tiempoTeleport));
+                tiempoTeleport += deltaTime;
+                if (Math.Sin(tiempoTeleport) > 0.999) personajePrincipal.Position = puerta1;
+            }
 
-            if (signo < 0) tiempoAcumulado -= deltaTime;
-            if (signo > 0) tiempoAcumulado += deltaTime;
+            if (Math.Abs(tiempoOlas) > 5) cambiarSigno(); 
+
+            if (signo < 0) tiempoOlas -= deltaTime;
+            if (signo > 0) tiempoOlas += deltaTime;
 
             MoverColeccionables(deltaTime);
 
@@ -251,9 +260,13 @@ namespace TGC.Group.Model.Escenarios
 
             personajePrincipal.animateAndRender(deltaTime);
 
-            //if (tiempoAcumulado > 10) tiempoAcumulado -=1;
-            efectoLava.SetValue("time", tiempoAcumulado);
+            efectoLava.SetValue("time", tiempoOlas);
 
+            if (activarTeleport) { 
+                personajePrincipal.Effect = efectoTeleport;
+                efectoTeleport.SetValue("time", tiempoTeleport);
+                personajePrincipal.Technique = "RenderScene";
+            }
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
@@ -506,19 +519,22 @@ namespace TGC.Group.Model.Escenarios
             {
                 if (puertaCruzada == 0)
                 {
-                    personajePrincipal.Position = puerta1;
+                    activarTeleport = true;
+
                     ultimoCP = puerta1;
                     puertaCruzada++;
                     return;
                 }
                 if (puertaCruzada == 1 && cantidadColeccionablesAgarrados == 3)
                 {
+                    activarTeleport = true;
                     personajePrincipal.Position = puerta2;
                     puertaCruzada++;
                     return;
                 }
                 if (puertaCruzada == 2 && cantidadColeccionablesAgarrados == 6)
                 {
+                    activarTeleport = true;
                     personajePrincipal.Position = puerta3;
                     ultimoCP = new TGCVector3(2715, 1, 2635);
                     puertaCruzada++;
@@ -717,6 +733,8 @@ namespace TGC.Group.Model.Escenarios
 
         private void AplicarShaders(String shaderDir){
             efectoLava = TgcShaders.loadEffect(shaderDir + "ShaderLava.fx");
+            efectoTeleport = TgcShaders.loadEffect(shaderDir + "RobotRoomChange.fx");
+
             foreach (TgcMesh mesh in lavas)
             {
                 mesh.Effect = efectoLava;
