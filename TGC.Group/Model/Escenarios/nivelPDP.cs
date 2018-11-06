@@ -30,6 +30,7 @@ namespace TGC.Group.Model.Escenarios
         private float tiempoTeleport;
         private float signo = 1;
         private bool activarTeleport = false;
+        private bool desactivarTeleport = false;
 
         private TgcScene scene;
         private float velocidadCaminar;
@@ -73,7 +74,6 @@ namespace TGC.Group.Model.Escenarios
         private float cantidadColeccionablesAgarrados = 0;
 
         private List<TgcMesh> dangerPlaces = new List<TgcMesh>();
-        private List<TgcMesh> lavas = new List<TgcMesh>();
 
         private TgcMp3Player reproductorMp3 = new TgcMp3Player();
         private string pathDeLaCancion;
@@ -84,7 +84,7 @@ namespace TGC.Group.Model.Escenarios
         private TGCVector3 charco2;
         private TGCVector3 charco3;
 
-        private TGCVector3 puerta1 = new TGCVector3(900, 1, 337);
+        private TGCVector3 puerta1 = new TGCVector3(1000, 1, 337);
         private TGCVector3 puerta2 = new TGCVector3(1705, 1, 337);
         private TGCVector3 puerta3 = new TGCVector3(3412, 1, 2103);
         private float puertaCruzada = 0;
@@ -92,8 +92,10 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic2;
         private TgcMesh charcoEstatic3;
 
-        private Microsoft.DirectX.Direct3D.Effect efectoLava;
+        private Microsoft.DirectX.Direct3D.Effect efectoOlas;
         private Microsoft.DirectX.Direct3D.Effect efectoTeleport;
+        private Microsoft.DirectX.Direct3D.Effect currentShaderSkeletalMesh;
+
 
 
         /// /////////////////////////////////////////////////////////////////////
@@ -167,13 +169,24 @@ namespace TGC.Group.Model.Escenarios
             float rotate = 0;
             moving = false;
 
-            if (activarTeleport) {
+            if (activarTeleport)
+            {
                 Console.WriteLine(Math.Sin(tiempoTeleport));
                 tiempoTeleport += deltaTime;
-                if (Math.Sin(tiempoTeleport) > 0.999) personajePrincipal.Position = puerta1;
+                if (Math.Sin(tiempoTeleport) > 0.999)
+                {
+                    if (puertaCruzada == 1) personajePrincipal.Position = puerta1;
+                    if (puertaCruzada == 2) personajePrincipal.Position = puerta2;
+                    if (puertaCruzada == 3) personajePrincipal.Position = puerta3;
+                }
+                if (Math.Sin(tiempoTeleport) < 0)
+                {
+                    tiempoTeleport = 0;
+                    desactivarTeleport = true;
+                    activarTeleport = false;
+                }
             }
-
-            if (Math.Abs(tiempoOlas) > 5) cambiarSigno(); 
+                if (Math.Abs(tiempoOlas) > 5) cambiarSigno(); 
 
             if (signo < 0) tiempoOlas -= deltaTime;
             if (signo > 0) tiempoOlas += deltaTime;
@@ -226,9 +239,6 @@ namespace TGC.Group.Model.Escenarios
 
             ajustarPosicionDeCamara();
 
-            // if (puertaCruzada == 3) moverPlatafoma(deltaTime);
-
-
             var Rot = TGCMatrix.RotationY(personajePrincipal.Rotation.Y);
             var T = TGCMatrix.Translation(personajePrincipal.Position);
             escalaBase = Rot * T;
@@ -244,8 +254,8 @@ namespace TGC.Group.Model.Escenarios
 
         public void render(float deltaTime, TgcFrustum frustum)
         {
-
-            // reproducirMusica();
+            if (activarTeleport) currentShaderSkeletalMesh = efectoTeleport;
+            else { currentShaderSkeletalMesh = TgcShaders.Instance.TgcSkeletalMeshShader; }
 
             foreach (var mesh in objectsInFront)
             {
@@ -255,18 +265,24 @@ namespace TGC.Group.Model.Escenarios
                     // if (resultadoColisionFrustum != TgcCollisionUtils.FrustumResult.OUTSIDE)
                     mesh.Render();
                 }
-                //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
 
-            personajePrincipal.animateAndRender(deltaTime);
+            efectoOlas.SetValue("time", tiempoOlas);
 
-            efectoLava.SetValue("time", tiempoOlas);
+            personajePrincipal.Effect = currentShaderSkeletalMesh;
 
             if (activarTeleport) { 
-                personajePrincipal.Effect = efectoTeleport;
                 efectoTeleport.SetValue("time", tiempoTeleport);
                 personajePrincipal.Technique = "RenderScene";
             }
+
+            if (desactivarTeleport){
+                personajePrincipal.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personajePrincipal.RenderType);
+                efectoTeleport.SetValue("time", 0);
+                desactivarTeleport = false;
+            }
+
+            personajePrincipal.animateAndRender(deltaTime);
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
@@ -520,7 +536,6 @@ namespace TGC.Group.Model.Escenarios
                 if (puertaCruzada == 0)
                 {
                     activarTeleport = true;
-
                     ultimoCP = puerta1;
                     puertaCruzada++;
                     return;
@@ -528,14 +543,12 @@ namespace TGC.Group.Model.Escenarios
                 if (puertaCruzada == 1 && cantidadColeccionablesAgarrados == 3)
                 {
                     activarTeleport = true;
-                    personajePrincipal.Position = puerta2;
                     puertaCruzada++;
                     return;
                 }
                 if (puertaCruzada == 2 && cantidadColeccionablesAgarrados == 6)
                 {
                     activarTeleport = true;
-                    personajePrincipal.Position = puerta3;
                     ultimoCP = new TGCVector3(2715, 1, 2635);
                     puertaCruzada++;
                     return;
@@ -727,21 +740,19 @@ namespace TGC.Group.Model.Escenarios
             dangerPlaces.Add(scene.Meshes[19]);
             dangerPlaces.Add(scene.Meshes[34]);
             dangerPlaces.Add(scene.Meshes[46]);
-            lavas.Add(scene.Meshes[34]);
-            lavas.Add(scene.Meshes[46]);
         }
 
         private void AplicarShaders(String shaderDir){
-            efectoLava = TgcShaders.loadEffect(shaderDir + "ShaderLava.fx");
+            efectoOlas = TgcShaders.loadEffect(shaderDir + "ShaderOlas.fx");
             efectoTeleport = TgcShaders.loadEffect(shaderDir + "RobotRoomChange.fx");
 
-            foreach (TgcMesh mesh in lavas)
+            foreach (TgcMesh mesh in dangerPlaces)
             {
-                mesh.Effect = efectoLava;
+                mesh.Effect = efectoOlas;
                 mesh.Technique = "Olas";
             }
-            efectoLava.SetValue("screen_dx", resolucionX);
-            efectoLava.SetValue("screen_dy", resolucionY);
+            efectoOlas.SetValue("screen_dx", resolucionX);
+            efectoOlas.SetValue("screen_dy", resolucionY);
         }
 
         private void cambiarSigno(){
