@@ -126,8 +126,6 @@ namespace TGC.Group.Model.Escenarios
             personajePrincipal.playAnimation("Parado", true);
 
             personajePrincipal.Position = new TGCVector3(210, 1, 310);
-            //personajePrincipal.Position = puerta2;
-            //personajePrincipal.Position = new TGCVector3(1401, 1, 2370);
             personajePrincipal.RotateY(Geometry.DegreeToRadian(180));
 
             camaraInterna = new TgcThirdPersonCamera(personajePrincipal.Position, 250, 500);
@@ -148,7 +146,7 @@ namespace TGC.Group.Model.Escenarios
             scene.Meshes.Add(charcoEstatic3);
 
             reproductorMp3.FileName = pathDeLaCancion;
-            //reproductorMp3.play(true);
+            reproductorMp3.play(true);
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
         }
@@ -172,7 +170,6 @@ namespace TGC.Group.Model.Escenarios
             if (activarTeleport)
             {
                 velocidadCaminar = 0;
-                Console.WriteLine(Math.Sin(tiempoTeleport));
                 tiempoTeleport += deltaTime;
                 if (Math.Sin(tiempoTeleport) > 0.999)
                 {
@@ -201,7 +198,6 @@ namespace TGC.Group.Model.Escenarios
 
             if (rotating)
             {
-                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
                 rotAngle = Geometry.DegreeToRadian(rotate * deltaTime);
                 personajePrincipal.RotateY(rotAngle);
                 camaraInterna.rotateY(rotAngle);
@@ -209,17 +205,14 @@ namespace TGC.Group.Model.Escenarios
             }
 
             var Movimiento = TGCVector3.Empty;
-            //Si hubo desplazamiento
             float scale = 1;
             if (!enElPiso)
                 scale = 0.4f;
 
             if (moving)
             {
-                //Activar animacion de caminando
                 personajePrincipal.playAnimation("Caminando", true);
 
-                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
                 var lastPos = personajePrincipal.Position;
                 var pminPersonaje = personajePrincipal.BoundingBox.PMin.Y;
                 var pmaxPersonaje = personajePrincipal.BoundingBox.PMax.Y;
@@ -326,7 +319,6 @@ namespace TGC.Group.Model.Escenarios
                 {
                     mesh.Dispose();
                 }
-                //scene.DisposeAll(); //Dispose de la escena.
                 reproductorMp3.closeFile();
             }
         }
@@ -404,7 +396,6 @@ namespace TGC.Group.Model.Escenarios
                 if (lastCollide == false)
                 {
                     enElPiso = false;
-                    //sliderFloorCollider = null;
                 }
 
             }

@@ -1,15 +1,4 @@
-//using Microsoft.DirectX.Direct3D;
-//using Microsoft.DirectX.DirectInput;
-//using TGC.Core.Direct3D;
 using TGC.Core.Example;
-//using TGC.Core.Mathematica;
-//using TGC.Core.SceneLoader;
-//using TGC.Core.SkeletalAnimation;
-//using System.Collections.Generic;
-//using TGC.Core.Collision;
-//using System.Reflection;
-//using System;
-//using TGC.Core.Sound;
 using TGC.Group.Model.Escenarios;
 
 namespace TGC.Group.Model
