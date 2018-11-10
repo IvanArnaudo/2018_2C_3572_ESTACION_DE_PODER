@@ -85,7 +85,8 @@ namespace TGC.Group.Model.Escenarios
         private TgcMesh charcoEstatic3;
         private Effect effect;
         private float effetTime = 0;
-
+        private Texture g_pRenderTarget, g_pRenderTarget4, g_pRenderTarget4Aux;
+        private Surface g_pDepthStencil;
 
         /// /////////////////////////////////////////////////////////////////////
         /// ////////////////////////////INIT/////////////////////////////////////
@@ -169,7 +170,23 @@ namespace TGC.Group.Model.Escenarios
             AdministradorDeEscenarios.getSingleton().SetCamara(camaraInterna);
 
             effect = TgcShaders.loadEffect(shaderDir + "RobotRoomChange.fx");
-            
+
+            g_pDepthStencil = d3dDevice.CreateDepthStencilSurface(d3dDevice.PresentationParameters.BackBufferWidth,
+                d3dDevice.PresentationParameters.BackBufferHeight,
+                DepthFormat.D24S8, MultiSampleType.None, 0, true);
+
+            g_pRenderTarget = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth
+                , d3dDevice.PresentationParameters.BackBufferHeight, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            g_pRenderTarget4 = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth / 4
+                , d3dDevice.PresentationParameters.BackBufferHeight / 4, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            g_pRenderTarget4Aux = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth / 4
+                , d3dDevice.PresentationParameters.BackBufferHeight / 4, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
         }
 
         /// /////////////////////////////////////////////////////////////////////
@@ -254,9 +271,26 @@ namespace TGC.Group.Model.Escenarios
         {
 
             // reproducirMusica();
+            var device = D3DDevice.Instance.Device;
+            var pOldRT = device.GetRenderTarget(0);
+            var pSurf = g_pRenderTarget.GetSurfaceLevel(0);
+            device.SetRenderTarget(0, pSurf);
+            // hago lo mismo con el depthbuffer, necesito el que no tiene multisampling
+            var pOldDS = device.DepthStencilSurface;
+            // Probar de comentar esta linea, para ver como se produce el fallo en el ztest
+            // por no soportar usualmente el multisampling en el render to texture.
+            device.DepthStencilSurface = g_pDepthStencil;
 
+            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+
+            effect.SetValue("time", effetTime);
+            effect.SetValue("screen_w", D3DDevice.Instance.Width);
+            effect.SetValue("screen_h", D3DDevice.Instance.Height);
+            effect.SetValue("robotPosition",TGCVector3.Vector3ToFloat4Array(personajePrincipal.BoundingBox.Position));
             foreach (var mesh in objectsInFront)
             {
+                //mesh.Effect = effect;
                 if (!coleccionablesAgarrados.Contains(mesh))
                 {
                     var resultadoColisionFrustum = TgcCollisionUtils.classifyFrustumAABB(frustum, mesh.BoundingBox);
@@ -265,10 +299,9 @@ namespace TGC.Group.Model.Escenarios
                 }
                 //Aproximacion a solucion de colision con cámara. Habria que mejorar el tema del no renderizado de elementos detras de la misma.
             }
-            personajePrincipal.Effect = effect;
+            //personajePrincipal.Effect = effect;
             effetTime += deltaTime;
-            effect.SetValue("time", effetTime);
-            personajePrincipal.Technique = "RenderScene";
+            //personajePrincipal.Technique = "RenderScene";
             personajePrincipal.animateAndRender(deltaTime);
 
             HUD.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
