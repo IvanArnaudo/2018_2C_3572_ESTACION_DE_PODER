@@ -254,7 +254,7 @@ namespace TGC.Group.Model.Escenarios
             }
             foreach (var mesh in scene.Meshes)
             {
-                if (mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North") || mesh.Name.Contains("West"))
+                if (mesh.Name.Contains("Box") || mesh.Name.Contains("Madera") || mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North") || mesh.Name.Contains("West"))
                     continue;
                 mesh.Effect = effect;
 
