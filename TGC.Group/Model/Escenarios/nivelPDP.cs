@@ -295,8 +295,9 @@ namespace TGC.Group.Model.Escenarios
 
             coleccionablesAdquiridos.cambiarTexto(cantidadColeccionablesAgarrados.ToString());
             coleccionablesAdquiridos.Render();
-
-            HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
+            coleccionablesAdquiridos.cambiarTamañoLetra(28);
+            coleccionablesAdquiridos.cambiarColor(Color.BlueViolet);
+            HUD.Draw2D(mumuki.D3dTexture, Rectangle.Empty, new SizeF(100, 100), new PointF(D3DDevice.Instance.Width - 100, D3DDevice.Instance.Height - 150), Color.White);
 
 
             HUD.End();

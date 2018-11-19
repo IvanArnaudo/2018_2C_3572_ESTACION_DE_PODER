@@ -56,6 +56,12 @@ namespace TGC.Group.Form
             //Focus panel3D.
             panel3D.Focus();
 
+            this.WindowState = FormWindowState.Normal;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
+            this.BringToFront();
+
+
             //Inicio el ciclo de Render.
             InitRenderLoop();
         }

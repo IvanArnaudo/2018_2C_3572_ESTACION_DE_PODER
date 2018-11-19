@@ -405,7 +405,7 @@ namespace TGC.Group.Model.Escenarios
             librosAdquiridos.cambiarColor(Color.BlueViolet);
             librosAdquiridos.Render();
 
-            HUD.Draw2D(fisicaLib.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
+            HUD.Draw2D(fisicaLib.D3dTexture, Rectangle.Empty, new SizeF(90, 90), new PointF(D3DDevice.Instance.Width - 95, D3DDevice.Instance.Height - 145), Color.White);
             HUD.End();
 
             emisorDeParticulas1.render(deltaTime);
@@ -923,7 +923,7 @@ namespace TGC.Group.Model.Escenarios
                     incremento = velocidadDesplazamientolibros * direccionDeMovimientoActualLibrosF1 * deltaTime;
                     libro.Move(0, incremento, 0);
                     distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 1000f)
+                    if (Math.Abs(distanciaRecorrida) > 800f)
                     {
                         direccionDeMovimientoActualLibrosF1 *= -1;
                         distanciaRecorrida = 0f;
