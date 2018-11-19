@@ -18,6 +18,16 @@ namespace TGC.Group.Model.Interfaz
         {
             texto.Text = text;
         }
+        
+        public void cambiarColor(Color newColor)
+        {
+            texto.Color = newColor;
+        }
+
+        public void cambiarTamañoLetra(float tamaño){
+            Font fuenteNueva  = new Font("Impact", tamaño, FontStyle.Regular, GraphicsUnit.Pixel);
+            texto.changeFont(fuenteNueva);
+        }
 
         public override void Update(float deltaTime, TgcD3dInput input){
             //si el mouse pasa por encima del boton:

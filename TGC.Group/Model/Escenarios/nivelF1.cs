@@ -401,6 +401,8 @@ namespace TGC.Group.Model.Escenarios
             }
 
             librosAdquiridos.cambiarTexto(cantidadLibrosAdquiridos.ToString());
+            librosAdquiridos.cambiarTamañoLetra(28);
+            librosAdquiridos.cambiarColor(Color.BlueViolet);
             librosAdquiridos.Render();
 
             HUD.Draw2D(fisicaLib.D3dTexture, Rectangle.Empty, new SizeF(50, 50), new PointF(D3DDevice.Instance.Width - 50, D3DDevice.Instance.Height - 90), Color.White);
