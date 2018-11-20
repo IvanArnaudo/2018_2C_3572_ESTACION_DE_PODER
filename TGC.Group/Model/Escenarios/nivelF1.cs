@@ -30,7 +30,7 @@ namespace TGC.Group.Model.Escenarios
         private float velocidadRotacion = 250;
         private float velocidadDesplazamientoPlataformas = 100f;
         private float velocidadDesplazamientolibros = 50f;
-        private float velocidadDesplazamientoBolasDeCanion = 200f;
+        private float velocidadDesplazamientoBolasDeCanion = 310f;
         private float sliderModifier = 1;
         private string sliderModifierType = "none";
         List<TgcMesh> slowSliders = new List<TgcMesh>();

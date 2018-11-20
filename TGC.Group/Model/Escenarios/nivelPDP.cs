@@ -422,7 +422,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
-                jumping = 2.5f;
+                jumping = 1.35f;
                 moving = true;
                 enElPiso = false;
             }
@@ -433,7 +433,7 @@ namespace TGC.Group.Model.Escenarios
             if (!enElPiso)
             {
                 velocidadCaminar = 1;
-                jumping -= 2.5f * dTime;
+                jumping -= 1.35f * dTime;
                 jump = jumping;
                 moving = true;
             }
