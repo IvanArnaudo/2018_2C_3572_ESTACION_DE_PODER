@@ -14,9 +14,9 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 * [TGC.Core](https://www.nuget.org/packages/TGC.Core/) (se baja automáticamente al hacer build por primera vez)
 
 ## Integrantes ##
-TGC, Tgcito  |  Apellido, Nombre
+Arnaudo, Ivan  |  Bio, Ronan
 ------------ | -------------
-<img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/robotgc.png" height="500"> | <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/trofeotp.png" height="500">
+<img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/índice.jpg" height="500"> | <img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/IMG_20181127_150011184.jpg" height="500">
 
 ## ScreenShot ##
 ![screenshot2](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen2.jpg)
