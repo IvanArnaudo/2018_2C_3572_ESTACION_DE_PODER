@@ -28,4 +28,4 @@ TGC, Tgcito  |  Apellido, Nombre
 ![screenshot7](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen7.jpg)
 
 ## Game Play ##
-[![Watch the video](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen4.jpg)](https://www.youtube.com/watch?v=kqNqJ5uxf-M)
+[![Watch the video](http://i3.ytimg.com/vi/kqNqJ5uxf-M/hqdefault.jpg)](https://www.youtube.com/watch?v=kqNqJ5uxf-M)
