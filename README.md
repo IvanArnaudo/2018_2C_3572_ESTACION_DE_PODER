@@ -19,11 +19,13 @@ TGC, Tgcito  |  Apellido, Nombre
 <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/robotgc.png" height="500"> | <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/trofeotp.png" height="500">
 
 ## ScreenShot ##
-![screenshot1](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot2](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot3](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot4](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
-![screenshot5](https://github.com/tgc-utn/tgc-group/blob/master/TGC.Group/Media/cajaMadera4.jpg)
+![screenshot1](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen1.jpg)
+![screenshot2](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen2.jpg)
+![screenshot3](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen3.jpg)
+![screenshot4](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen4.jpg)
+![screenshot5](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen5.jpg)
+![screenshot6](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen6.jpg)
+![screenshot7](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen7.jpg)
 
 ## Game Play ##
-[![Watch the video](https://img.youtube.com/vi/qESIu8ozanU/0.jpg)](https://www.youtube.com/playlist?list=PLRM4L32DjvnazuMl8wZlbpEYL5Qh63ulG)
+[![Watch the video](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/TGC.Group/Media/capturas/screen4.jpg)](https://www.youtube.com/watch?v=kqNqJ5uxf-M)
