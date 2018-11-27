@@ -21,7 +21,7 @@ using TGC.Core.Particle;
 
 namespace TGC.Group.Model.Escenarios
 {
-    class nivelF1:Escenario{
+    class nivelF1 : Escenario {
 
         private float resolucionX;
         private float resolucionY;
@@ -32,11 +32,9 @@ namespace TGC.Group.Model.Escenarios
         private float velocidadDesplazamientolibros = 50f;
         private float velocidadDesplazamientoBolasDeCanion = 310f;
         private float sliderModifier = 1;
-        private string sliderModifierType = "none";
         List<TgcMesh> slowSliders = new List<TgcMesh>();
         List<TgcMesh> fastSliders = new List<TgcMesh>();
         List<TgcMesh> aguas = new List<TgcMesh>();
-
 
         private float tiempoOlas;
         private float signo = 1;
@@ -93,11 +91,9 @@ namespace TGC.Group.Model.Escenarios
         private TgcScene scene;
 
         private TGCVector3 puntoCheckpointActual = new TGCVector3(400, 1, 400);
-        //private TGCVector3 puntoCheckpointActual = new TGCVector3(1500, -590, 1500);
-        //private TGCVector3 puntoCheckpointActual = new TGCVector3(2392, 61, 3308);
-
         private TGCVector3 puntoCheckpoint1 = new TGCVector3(410, 322, 5050);
         private TGCVector3 puntoCheckpoint2 = new TGCVector3(1129, -567, 155);
+
         private List<TgcMesh> lights = new List<TgcMesh>();
 
         private float incremento = 0f, incrementoBola1 = 0f, incrementoBola2 = 0f, incrementoBola3 = 0f, rotAngle = 0f;
@@ -111,6 +107,7 @@ namespace TGC.Group.Model.Escenarios
         private TgcTexture fisicaLib;
         private TgcBoundingAxisAlignBox checkpoint1 = new TgcBoundingAxisAlignBox(new TGCVector3(839, 591, 4969), new TGCVector3(23, 395, 5120));
         private TgcBoundingAxisAlignBox checkpoint2 = new TgcBoundingAxisAlignBox(new TGCVector3(1621, -68, 7766), new TGCVector3(923, -565, 8069));
+        private TgcBoundingAxisAlignBox checkpoint3 = new TgcBoundingAxisAlignBox(new TGCVector3(1201, -201, 9247), new TGCVector3(1398, -300, 9101));
         private int posVidas;
         private Microsoft.DirectX.Direct3D.Effect effect;
         private Microsoft.DirectX.Direct3D.Effect efectoOlas;
@@ -121,6 +118,9 @@ namespace TGC.Group.Model.Escenarios
         private ParticleEmitter emisorDeParticulas3;
         private int cantidadDeParticulas;
         private string pathTexturaEmisorDeParticulas;
+
+        private Microsoft.DirectX.Direct3D.Effect sinEfectos;
+        private string tecnicaNormal;
 
         /////////////////////////////////////////////////////////////////////////
         ////////////////////////////////INIT/////////////////////////////////////
@@ -172,7 +172,7 @@ namespace TGC.Group.Model.Escenarios
             // camara = camaraInterna;
             camaraInterna.rotateY(Geometry.DegreeToRadian(180));
 
-            librosAdquiridos = new Boton(cantidadLibrosAdquiridos.ToString(), 0.925f, 0.88f, null);
+            librosAdquiridos = new Boton(cantidadLibrosAdquiridos.ToString(), resolucionX - (resolucionX / 9), resolucionY - (resolucionY / 7), null);
 
             plataforma1 = scene.Meshes[164];
             plataforma2 = scene.Meshes[165];
@@ -199,7 +199,7 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas1.MinSizeParticle = 30f;
             emisorDeParticulas1.MaxSizeParticle = 30f;
             emisorDeParticulas1.ParticleTimeToLive = 1f;
-            emisorDeParticulas1.CreationFrecuency = 0.25f;
+            emisorDeParticulas1.CreationFrecuency = 1f; //0.25
             emisorDeParticulas1.Dispersion = 500;
             emisorDeParticulas1.Speed = new TGCVector3(-25, 40, 50);
             posicionInicialEmisorDeParticulas1 = new TGCVector3(1935, 200, 4345);
@@ -210,7 +210,7 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas2.MinSizeParticle = 30f;
             emisorDeParticulas2.MaxSizeParticle = 30f;
             emisorDeParticulas2.ParticleTimeToLive = 1f;
-            emisorDeParticulas2.CreationFrecuency = 0.25f;
+            emisorDeParticulas2.CreationFrecuency = 1f;
             emisorDeParticulas2.Dispersion = 500;
             emisorDeParticulas2.Speed = new TGCVector3(-25, 40, 50);
             posicionInicialEmisorDeParticulas2 = new TGCVector3(2205, 200, 4345);
@@ -221,7 +221,7 @@ namespace TGC.Group.Model.Escenarios
             emisorDeParticulas3.MinSizeParticle = 30f;
             emisorDeParticulas3.MaxSizeParticle = 30f;
             emisorDeParticulas3.ParticleTimeToLive = 1f;
-            emisorDeParticulas3.CreationFrecuency = 0.25f;
+            emisorDeParticulas3.CreationFrecuency = 1f;
             emisorDeParticulas3.Dispersion = 500;
             emisorDeParticulas3.Speed = new TGCVector3(-25, 40, 50);
             posicionInicialEmisorDeParticulas3 = new TGCVector3(2495, 200, 4345);
@@ -252,9 +252,12 @@ namespace TGC.Group.Model.Escenarios
                 pointLightIntensity[i] = 20;
                 pointLightAttenuation[i] = 0.07f;
             }
+            tecnicaNormal = scene.Meshes[0].Technique;
+            sinEfectos = scene.Meshes[0].Effect;
             foreach (var mesh in scene.Meshes)
             {
-                if (mesh.Name.Contains("Box") || mesh.Name.Contains("Madera") || mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North") || mesh.Name.Contains("West"))
+                //if (mesh.Name.Contains("Box") || mesh.Name.Contains("Madera") || mesh.Name.Contains("East") || mesh.Name.Contains("South") || mesh.Name.Contains("North") || mesh.Name.Contains("West"))
+                if (!mesh.Name.Contains("Floor"))
                     continue;
                 mesh.Effect = effect;
 
@@ -480,6 +483,7 @@ namespace TGC.Group.Model.Escenarios
             var mainMeshBoundingBox = personajePrincipal.BoundingBox;
             var colisionCheckp = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint1);
             var colisionCheckp2 = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint2);
+            var colisionCheckp3 = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, checkpoint3);
             if (colisionCheckp != TgcCollisionUtils.BoxBoxResult.Afuera)
             {
                 puntoCheckpointActual = puntoCheckpoint1;
@@ -487,9 +491,15 @@ namespace TGC.Group.Model.Escenarios
             {
                 puntoCheckpointActual = puntoCheckpoint2;
             }
+            else if (colisionCheckp3 != TgcCollisionUtils.BoxBoxResult.Afuera)
+            {
+                foreach (var mesh in scene.Meshes)
+                {
+                    mesh.Effect = sinEfectos;
+                    mesh.Technique = tecnicaNormal;
+                }
+            }
         }
-
-
 
         private void DetectarColisiones(TGCVector3 lastPos, float pminYAnteriorPersonaje, float pmaxYAnteriorPersonaje, float dtime)
         {
@@ -549,7 +559,6 @@ namespace TGC.Group.Model.Escenarios
                     MoverObjetos(mesh, movementRay);
                     CaerseAlAgua(mesh,movementRay);
                     verSiSeCompletoNivel(mesh);
-                    personajePrincipal.playAnimation("Caminando", true);
                     AgarrarLibros(mesh);
                 }
                 if (lastCollide == false && floorCollider != null)
@@ -658,14 +667,14 @@ namespace TGC.Group.Model.Escenarios
                 var lastCajaPos = mesh.Position;
                 if (FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z))
                 {
-                    personajePrincipal.playAnimation("Empujar", true);
+                    //personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(5 * Math.Sign(movementRay.X) * -1, 0, 0);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
                 else
                  if (!(FastMath.Abs(movementRay.X) > FastMath.Abs(movementRay.Z)))
                 {
-                    personajePrincipal.playAnimation("Empujar", true);
+                    //personajePrincipal.playAnimation("Empujar", true);
                     mesh.Move(0, 0, 5 * Math.Sign(movementRay.Z) * -1);
                     DetectarColisionesMovibles(lastCajaPos, mesh);
                 }
@@ -779,7 +788,6 @@ namespace TGC.Group.Model.Escenarios
             }
 
             rs.Scale(0.2f*sliderModifier);
-            handleSliderModifier();
 
             if (!enElPiso && !techo)
                 rs.Y = -jump * dtime;
@@ -841,25 +849,6 @@ namespace TGC.Group.Model.Escenarios
             camaraInterna.SetCamera(position, target);
         }
 
-        private void handleSliderModifier()
-        {
-            if (sliderModifierType == "slow")
-                handleSlowSliderModifier();
-            else if (sliderModifierType == "fast")
-                handleFastSliderModifier();
-        }
-
-        private void handleFastSliderModifier()
-        {
-            if (floorCollider == null || sliderFloorCollider == null || (floorCollider != sliderFloorCollider && enElPiso))
-                sliderModifier = 1;
-        }
-
-        private void handleSlowSliderModifier()
-        {
-            if (floorCollider == null || sliderFloorCollider == null || floorCollider != sliderFloorCollider)
-                sliderModifier = 1;
-        }
         private TGCVector3 getClosestLight(TGCVector3 pos)
         {
             var minDist = float.MaxValue;
@@ -923,7 +912,7 @@ namespace TGC.Group.Model.Escenarios
                     incremento = velocidadDesplazamientolibros * direccionDeMovimientoActualLibrosF1 * deltaTime;
                     libro.Move(0, incremento, 0);
                     distanciaRecorrida = distanciaRecorrida + incremento;
-                    if (Math.Abs(distanciaRecorrida) > 800f)
+                    if (Math.Abs(distanciaRecorrida) > 500f)
                     {
                         direccionDeMovimientoActualLibrosF1 *= -1;
                         distanciaRecorrida = 0f;

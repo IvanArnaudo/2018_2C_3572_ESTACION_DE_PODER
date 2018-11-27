@@ -34,10 +34,18 @@ namespace TGC.Group.Model.Interfaz
             texto.Size = tamanio;
 
             var vp = D3DDevice.Instance.Device.Viewport;
-            texto.Position = new Point(
-                (int)((posX * vp.Width)),
-                (int)((posY * vp.Height))
-            );
+
+            if (posX > 1 || posY > 1)
+            {
+                texto.Position = new Point((int)posX, (int)posY);
+            }
+            else
+            {
+                texto.Position = new Point(
+                    (int)((posX * vp.Width)),
+                    (int)((posY * vp.Height))
+                );
+            }
         }
 
         public Rectangle getBounds(){

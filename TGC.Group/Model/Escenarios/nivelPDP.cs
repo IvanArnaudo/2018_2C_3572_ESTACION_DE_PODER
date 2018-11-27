@@ -135,7 +135,7 @@ namespace TGC.Group.Model.Escenarios
             vida = TgcTexture.createTexture(MediaDir + "Textures\\vida.png");
             mumuki = TgcTexture.createTexture(MediaDir + "Textures\\iconoMumuki.png");
 
-            coleccionablesAdquiridos = new Boton(cantidadColeccionablesAgarrados.ToString(), 0.925f, 0.88f, null);
+            coleccionablesAdquiridos = new Boton(cantidadColeccionablesAgarrados.ToString(), 0.9f, 0.88f, null);
 
             SetearListas();
             AplicarShaders(shaderDir);
@@ -422,7 +422,7 @@ namespace TGC.Group.Model.Escenarios
         {
             if (input.keyUp(Key.Space) && DistanciaAlPisoSalto())
             {
-                jumping = 1.35f;
+                jumping = 1.5f;
                 moving = true;
                 enElPiso = false;
             }
