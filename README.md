@@ -17,6 +17,9 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 Arnaudo, Ivan  |  Bio, Ronan
 ------------ | -------------
 <img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/índice.jpg" height="500"> | <img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/IMG_20181127_150011184.jpg" height="500">
+Dati, Alvaro  |  Gullon, Tomas
+------------ | -------------
+<img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/índice2.jpg" height="500"> | <img src="https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/fotos/índice3.jpg" height="500">
 
 ## ScreenShot ##
 ![screenshot2](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen2.jpg)
