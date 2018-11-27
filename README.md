@@ -19,7 +19,6 @@ TGC, Tgcito  |  Apellido, Nombre
 <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/robotgc.png" height="500"> | <img src="https://github.com/tgc-utn/tgc-utn.github.io/blob/master/images/trofeotp.png" height="500">
 
 ## ScreenShot ##
-![screenshot1](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen1.jpg)
 ![screenshot2](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen2.jpg)
 ![screenshot3](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen3.jpg)
 ![screenshot4](https://github.com/IvanArnaudo/2018_2C_3572_ESTACION_DE_PODER/blob/master/TGC.Group/Media/capturas/screen4.jpg)
